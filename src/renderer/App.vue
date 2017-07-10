@@ -27,7 +27,11 @@
   import fs from 'fs';
   import { ipcRenderer } from 'electron';
   import { mapState } from 'vuex';
-  import { UPDATE_PATH, UPDATE_CONFIG } from './store';
+  import {
+      UPDATE_PATH,
+      UPDATE_CONFIG,
+      UPDATE_FULL_SCREEN,
+  } from './store';
   import constant from 'constant';
   import MusicList from '~/components/MusicList';
   import MusicPlayer from '~/components/MusicPlayer';
@@ -38,7 +42,6 @@
       return {
         showDialog: false,
         musicPath: '',
-        isFullScreen: false,
       };
     },
     components: {
@@ -49,6 +52,7 @@
       ...mapState([
         'sourceConfig',
         'simpleMode',
+        'isFullScreen',
       ]),
     },
     watch: {
@@ -91,11 +95,11 @@
       });
 
       ipcRenderer.on(constant.ENTER_FULL_SCREEN, () => {
-        this.isFullScreen = true;
+        this.$store.commit(UPDATE_FULL_SCREEN, true);
       });
 
       ipcRenderer.on(constant.LEAVE_FULL_SCREEN, () => {
-        this.isFullScreen = false;
+        this.$store.commit(UPDATE_FULL_SCREEN, false);
       });
 
       window.addEventListener('keyup', e => {

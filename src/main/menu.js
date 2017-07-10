@@ -7,9 +7,6 @@ export default function(win) {
     {
       label: 'View',
       submenu: [
-        { role: 'reload' },
-        { role: 'forcereload' },
-        { role: 'toggledevtools' },
         { type: 'separator' },
         { role: 'resetzoom' },
         { role: 'zoomin' },
@@ -37,6 +34,14 @@ export default function(win) {
       ],
     },
   ];
+
+  if (process.env.NODE_ENV === 'development') {
+    template[0].submenu.unshift(
+      { role: 'reload' },
+      { role: 'forcereload' },
+      { role: 'toggledevtools' }
+    );
+  }
 
   if (process.platform === 'darwin') {
     template.unshift({

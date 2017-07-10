@@ -16,6 +16,7 @@ export const UPDATE_PATH = 'updatePath';
 export const UPDATE_MUSIC = 'updateMusic';
 export const UPDATE_CONFIG = 'updateConfig';
 export const UPDATE_SIMPLE_MODE = 'updateSimpleMode';
+export const UPDATE_FULL_SCREEN = 'updateFullScreen';
 export const initStore = config => {
   return new Vuex.Store({
     state: {
@@ -25,6 +26,7 @@ export const initStore = config => {
       playStyle: 'column',
       sourceConfig: config,
       simpleMode: false,
+      isFullScreen: false,
     },
     mutations: {
       [SELECT_MUSIC](state, id) {
@@ -58,6 +60,11 @@ export const initStore = config => {
 
       [UPDATE_SIMPLE_MODE](state, mode) {
         state.simpleMode = mode;
+      },
+
+      [UPDATE_FULL_SCREEN](state, isFullScreen) {
+        state.isFullScreen = isFullScreen;
+        state.simpleMode = isFullScreen;
       },
     },
     actions: {
