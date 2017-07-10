@@ -1,7 +1,8 @@
 import Vue from 'vue';
 import App from './App';
-import { remote } from 'electron';
-import { store } from './store';
+import constant from 'constant';
+import { remote, ipcRenderer } from 'electron';
+import { initStore } from './store';
 
 if (!process.env.IS_WEB) {
   Vue.use(require('vue-electron'));
@@ -9,10 +10,14 @@ if (!process.env.IS_WEB) {
 
 Vue.config.productionTip = false;
 
-new Vue({
-  el: '#app',
-  store,
-  render(h) {
-    return h(App);
-  },
+// sync music list from main process
+ipcRenderer.send(constant.VIEW_READY);
+ipcRenderer.on(constant.INIT_CONFIG, (event, config) => {
+  new Vue({
+    el: '#app',
+    store: initStore(config),
+    render(h) {
+      return h(App);
+    },
+  });
 });

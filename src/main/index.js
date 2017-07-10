@@ -1,7 +1,15 @@
-import { app, screen, BrowserWindow, ipcMain } from 'electron' // eslint-disable-line
+import {
+  app,
+  screen,
+  BrowserWindow,
+  ipcMain,
+} from 'electron';
 import http from 'http';
 import path from 'path';
 import fs from 'fs';
+import menu from './menu';
+import store from './store';
+import constant from '../constant';
 
 /**
  * Set `__static` path to static files in production
@@ -16,29 +24,28 @@ const winURL = process.env.NODE_ENV === 'development'
   ? 'http://localhost:9080'
   : `file://${__dirname}/index.html`;
 
-const allowFiles = {
-  '.mp3': 'audio/mpeg',
-  '.wav': 'audio/wav',
-};
+const allowFiles = { '.mp3': 'audio/mpeg', '.wav': 'audio/wav' };
 const allowKeys = Object.keys(allowFiles);
-const musicPath = '/Users/wanghx/Music/网易云音乐/';
-const musicList = fs.readdirSync(musicPath)
-  .filter(f => allowKeys.indexOf(path.extname(f)) >= 0);
 
 function createWindow() {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
   mainWindow = new BrowserWindow({
     height, width,
     useContentSize: true,
-    titleBarStyle: 'hidden',
+    titleBarStyle: 'hidden-inset',
+    frame: false,
+    transparent: true,
   });
 
   startMusicServer(port => {
-    ipcMain.on('get-music-list', event => {
-      event.sender.send('sync-music-list', musicList.map(f => ({
-        url: `http://127.0.0.1:${port}/${f}`,
-        name: path.basename(f, path.extname(f)),
-      })));
+    ipcMain.on(constant.VIEW_READY, event => {
+      event.sender.send(constant.INIT_CONFIG, Object.assign(store.config, {
+        port, allowKeys,
+      }));
+    });
+
+    ipcMain.on(constant.SAVE_CONFIG, (event, { key, value }) => {
+      store.set(key, value);
     });
 
     mainWindow.loadURL(winURL);
@@ -47,6 +54,17 @@ function createWindow() {
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
+
+  [
+    constant.ENTER_FULL_SCREEN,
+    constant.LEAVE_FULL_SCREEN,
+  ].forEach(key => {
+    mainWindow.on(key, () => {
+      mainWindow.webContents.send(key);
+    });
+  });
+
+  menu(mainWindow);
 }
 
 function startMusicServer(callback) {
@@ -58,7 +76,7 @@ function startMusicServer(callback) {
     }
 
     const filename = path.basename(musicUrl);
-    const fileUrl = path.join(musicPath, filename);
+    const fileUrl = path.join(store.get(constant.MUSIC_PATH), filename);
     if (!fs.existsSync(fileUrl)) {
       return notFound(res);
     }
@@ -73,7 +91,7 @@ function startMusicServer(callback) {
       'Last-Modified': String(stat.mtime).replace(/\([^\x00-\xff]+\)/g, '').trim(),
     });
     source.pipe(res);
-  }).listen(9999, () => {
+  }).listen(0, () => {
     callback(server.address().port);
   });
 

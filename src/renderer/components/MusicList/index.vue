@@ -2,9 +2,9 @@
   <div class="music-list">
     <div class="music-scroller">
       <div class="music-item"
-           v-for="item, index in musicList"
-           :class="{ playing: selectIndex === index }"
-           @click="select(index)">
+           v-for="item in musicList"
+           :class="{ playing: currentId === item.id }"
+           @click="select(item.id)">
         {{ item.name }}
       </div>
     </div>
@@ -21,13 +21,13 @@
     },
     computed: {
       ...mapState([
-        'selectIndex',
+        'currentId',
         'musicList',
       ]),
     },
     methods: {
-      select(index) {
-        this.$store.commit(SELECT_MUSIC, index);
+      select(id) {
+        this.$store.commit(SELECT_MUSIC, id);
       },
     },
   };
@@ -38,13 +38,23 @@
     height: 100%;
     overflow: hidden;
   }
-  
+
+  .fullscreen {
+    .music-scroller {
+      transform: translateY(0);
+      border-bottom: 0;
+    }
+  }
+
   .music-scroller {
     width: 100%;
     height: 100%;
     padding-right: 20px;
     overflow-y: auto;
     overflow-x: hidden;
+    transition: transform .3s;
+    transform: translateY(30px);
+    border-bottom: 30px solid transparent;
   }
 
   .music-item {
@@ -69,7 +79,7 @@
 
     &.playing {
       color: #fff;
-      background-color: #000;
+      background-color: rgba(0, 0, 0, .8);
     }
   }
 </style>
