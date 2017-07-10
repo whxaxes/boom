@@ -1,4 +1,4 @@
-import * as electron from 'electron';
+const electron = require('electron');
 import path from 'path';
 import fs from 'fs';
 

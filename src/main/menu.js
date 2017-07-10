@@ -1,7 +1,8 @@
-import { app, shell, Menu } from 'electron';
 import constant from '../constant';
 
 export default function(win) {
+  const electron = require('electron');
+  const { app, shell, Menu } = electron;
   const template = [
     {
       label: 'View',
