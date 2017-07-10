@@ -5,6 +5,20 @@ export default function(win) {
   const { app, shell, Menu } = electron;
   const template = [
     {
+      label: 'Edit',
+      submenu: [
+        { role: 'undo' },
+        { role: 'redo' },
+        { type: 'separator' },
+        { role: 'cut' },
+        { role: 'copy' },
+        { role: 'paste' },
+        { role: 'pasteandmatchstyle' },
+        { role: 'delete' },
+        { role: 'selectall' },
+      ],
+    },
+    {
       label: 'View',
       submenu: [
         { type: 'separator' },
@@ -36,7 +50,7 @@ export default function(win) {
   ];
 
   if (process.env.NODE_ENV === 'development') {
-    template[0].submenu.unshift(
+    template[1].submenu.unshift(
       { role: 'reload' },
       { role: 'forcereload' },
       { role: 'toggledevtools' }
