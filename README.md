@@ -22,7 +22,7 @@ npm run lint
 
 ```
 
-![](./image.jpeg)
+![](./image.png)
 
 ---
 
