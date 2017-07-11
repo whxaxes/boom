@@ -1,7 +1,8 @@
-const ColumnCount = 30;
-const ColumnList = [];
-const distance = 40;
-const RedDivHeight = 5;
+const COL_COUNT = 30;
+const COL_DIS = 40;
+const RED_BOX_H = 5;
+const SPLIT_DIS = 3;
+const FULL_H = RED_BOX_H + SPLIT_DIS;
 let grd;
 
 class Column {
@@ -10,57 +11,60 @@ class Column {
     this.h = h;
     this.x = x;
     this.y = y;
-    this.jg = 3;
     this.power = 0;
     this.dy = y;
-    this.num = 0;
     this.ctx = ctx;
   }
 
   update(power) {
     this.power = this.h * power / 256;
-    this.num = ~~(this.power / RedDivHeight + 0.5);
 
     // update position
-    const nh = this.dy + RedDivHeight;
+    const nh = this.dy + RED_BOX_H;
     if (this.power >= this.y - nh) {
-      this.dy = this.y - this.power - RedDivHeight - (this.power === 0 ? 0 : 1);
+      this.dy = this.y - this.power - RED_BOX_H - (this.power === 0 ? 0 : 1);
     } else if (nh > this.y) {
-      this.dy = this.y - RedDivHeight;
+      this.dy = this.y - RED_BOX_H;
     } else {
       this.dy += 1;
     }
-
-    this.draw();
   }
 
   draw() {
     const ctx = this.ctx;
     ctx.fillStyle = grd;
-    const h = (~~(this.power / (RedDivHeight + this.jg))) * (RedDivHeight + this.jg);
+    const h = (~~(this.power / FULL_H)) * FULL_H;
     ctx.fillRect(this.x, this.y - h, this.w, h);
-    for (let i = 0; i < this.num; i++) {
-      const y = this.y - i * (RedDivHeight + this.jg);
-      ctx.clearRect(this.x - 1, y, this.w + 2, this.jg);
-    }
-    ctx.fillStyle = '#950000';
-    ctx.fillRect(this.x, ~~this.dy, this.w, RedDivHeight);
+  }
+
+  drawLater() {
+    this.ctx.fillStyle = '#950000';
+    this.ctx.fillRect(this.x, ~~this.dy, this.w, RED_BOX_H);
   }
 }
 
 export default {
+  columnList: [],
+
   init(canvas) {
     this._canvas = document.createElement('canvas');
     this._canvas.width = canvas.width;
     this._canvas.height = canvas.height / 2;
-
-    const aw = (canvas.width - 2 * distance) / ColumnCount;
-    const w = aw - 5;
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
     this._ctx = this._canvas.getContext('2d');
+
+    // calculate width
+    const aw = (canvas.width - 2 * COL_DIS) / COL_COUNT;
+    const w = aw - 5;
+
+    // calculate height
     const imgHeight = canvas.height / 2;
-    const columnHeight = imgHeight - 100;
+    this.num = ~~((imgHeight - 100) / FULL_H);
+    const columnHeight = this.num * FULL_H;
+    this.start = imgHeight - columnHeight;
+
+    // gradient color
     grd = this._ctx.createLinearGradient(
       canvas.width / 2, imgHeight - columnHeight,
       canvas.width / 2, canvas.height / 2
@@ -69,11 +73,12 @@ export default {
     grd.addColorStop(0.5, '#FFFF00');
     grd.addColorStop(1, '#00E800');
 
-    for (let i = 0; i < ColumnCount; i++) {
-      ColumnList.push(new Column(
+    // generate columns
+    for (let i = 0; i < COL_COUNT; i++) {
+      this.columnList.push(new Column(
         this._ctx,
         w, columnHeight,
-        distance + i * aw,
+        COL_DIS + i * aw,
         imgHeight
       ));
     }
@@ -82,12 +87,23 @@ export default {
   update(array) {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this._ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    const ratio = array.length / this.canvas.width;
+    const len = ~~(array.length / this.columnList.length) - 2;
 
-    for (let i = 0; i < ColumnList.length; i++) {
-      const rt = ColumnList[i];
-      rt.index = ('index' in rt) ? rt.index : ~~(rt.x * ratio);
-      rt.update(array[rt.index]);
+    // draw column
+    for (let i = 0, j = 0; i < this.columnList.length; i++, j += len) {
+      const rt = this.columnList[i];
+      rt.update(array[j]);
+      rt.draw();
+    }
+
+    // split column
+    for (let i = 0; i < this.num; i++) {
+      this._ctx.clearRect(0, this.start + i * FULL_H, this.canvas.width, SPLIT_DIS);
+    }
+
+    // draw red box
+    for (let i = 0; i < this.columnList.length; i++) {
+      this.columnList[i].drawLater();
     }
 
     this.copy();
