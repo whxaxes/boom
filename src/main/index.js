@@ -55,15 +55,6 @@ function createWindow() {
     mainWindow = null;
   });
 
-  [
-    constant.ENTER_FULL_SCREEN,
-    constant.LEAVE_FULL_SCREEN,
-  ].forEach(key => {
-    mainWindow.on(key, () => {
-      mainWindow.webContents.send(key);
-    });
-  });
-
   menu(mainWindow);
 }
 

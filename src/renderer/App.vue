@@ -25,7 +25,7 @@
 
 <script>
   import fs from 'fs';
-  import { ipcRenderer } from 'electron';
+  import { ipcRenderer, remote } from 'electron';
   import { mapState } from 'vuex';
   import {
       UPDATE_PATH,
@@ -79,6 +79,27 @@
           value: this.musicPath,
         });
       },
+
+      listen() {
+        ipcRenderer.on(constant.PREFERENCES, () => {
+          this.showDialog = true;
+        });
+
+        const win = remote.getCurrentWindow();
+        win.on('enter-full-screen', () => {
+          this.$store.commit(UPDATE_FULL_SCREEN, true);
+        });
+
+        win.on('leave-full-screen', () => {
+          this.$store.commit(UPDATE_FULL_SCREEN, false);
+        });
+
+        window.addEventListener('keyup', e => {
+          if (e.keyCode === 27) {
+            this.showDialog = false;
+          }
+        });
+      },
     },
     mounted() {
       const musicPath = this.sourceConfig[constant.MUSIC_PATH];
@@ -90,23 +111,7 @@
         this.$store.commit(UPDATE_PATH, this.musicPath);
       }
 
-      ipcRenderer.on(constant.PREFERENCES, () => {
-        this.showDialog = true;
-      });
-
-      ipcRenderer.on(constant.ENTER_FULL_SCREEN, () => {
-        this.$store.commit(UPDATE_FULL_SCREEN, true);
-      });
-
-      ipcRenderer.on(constant.LEAVE_FULL_SCREEN, () => {
-        this.$store.commit(UPDATE_FULL_SCREEN, false);
-      });
-
-      window.addEventListener('keyup', e => {
-        if (e.keyCode === 27) {
-          this.showDialog = false;
-        }
-      });
+      this.listen();
     },
   };
 </script>
