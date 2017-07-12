@@ -1299,7 +1299,9 @@ __WEBPACK_IMPORTED_MODULE_2_electron__["app"].on('activate', function () {
   VIEW_READY: 'viewReady',
   INIT_CONFIG: 'initConfig',
   SAVE_CONFIG: 'saveConfig',
+  CURRENT_ID: 'currentId',
   MUSIC_PATH: 'musicPath',
+  LIKED_LIST: 'likedList',
   PREFERENCES: 'preferences'
 });
 
@@ -3017,12 +3019,17 @@ var Store = function () {
   }, {
     key: 'set',
     value: function set(key, value) {
+      var _this = this;
+
       this.config[key] = value;
-      try {
-        __WEBPACK_IMPORTED_MODULE_4_fs___default.a.writeFileSync(this.path, __WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_json_stringify___default()(this.config));
-      } catch (e) {
-        console.error(e);
-      }
+      clearTimeout(this.saveTimeout);
+      this.saveTimeout = setTimeout(function () {
+        try {
+          __WEBPACK_IMPORTED_MODULE_4_fs___default.a.writeFileSync(_this.path, __WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_json_stringify___default()(_this.config));
+        } catch (e) {
+          console.error(e);
+        }
+      }, 500);
     }
   }]);
 

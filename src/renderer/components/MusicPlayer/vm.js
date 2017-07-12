@@ -1,11 +1,17 @@
 import { mapState } from 'vuex';
 import { remote } from 'electron';
-import { SELECT_MUSIC, UPDATE_SIMPLE_MODE } from '~/store';
+import {
+  SELECT_MUSIC_ACT,
+  UPDATE_SIMPLE_MODE,
+  UPDATE_CONFIG,
+} from '~/store';
 import styles from './styles';
 const win = remote.getCurrentWindow();
 const AC = new window.AudioContext();
 const analyser = AC.createAnalyser();
 const gainnode = AC.createGain();
+const loopTypes = { normal: 0, single: 1, like: 2 };
+const loopCount = Object.keys(loopTypes).length;
 let loopVm;
 gainnode.gain.value = 1;
 
@@ -15,14 +21,16 @@ export default {
     return {
       audioSource: null,
       bufferSource: null,
+      loopTypes,
       audioStatus: {
         currentTime: 0,
         duration: 0,
         playing: false,
-        loop: false,
+        loop: loopTypes.like,
         muted: false,
       },
       url: '',
+      name: '',
     };
   },
   computed: {
@@ -31,6 +39,7 @@ export default {
       'musicList',
       'playStyle',
       'simpleMode',
+      'sourceConfig',
     ]),
 
     progress() {
@@ -44,26 +53,30 @@ export default {
   },
   watch: {
     currentId(id) {
-      this.currentMusic = this.musicList
-        .filter(item => item.id === id)[0];
-      this.playMusic();
+      this.changeMusic(id, true);
     },
   },
   methods: {
-    playMusic() {
-      this.url = this.currentMusic.url;
-      this.$nextTick(() => {
-        this.$refs.audio.load();
-        this.$refs.audio.play();
-      });
+    changeMusic(id, play) {
+      const music = this.musicList.find(item => item.id === id);
+      if (music) {
+        this.url = music.url;
+        this.name = music.name;
+        if (play) {
+          this.$nextTick(() => {
+            this.$refs.audio.load();
+            this.$refs.audio.play();
+          });
+        }
+      }
     },
 
     play() {
-      if (!this.$refs.audio.currentSrc) {
+      if (!this.url) {
         if (this.musicList.length) {
           const index = ~~(this.musicList.length * Math.random());
-          this.$store.commit(
-            SELECT_MUSIC,
+          this.$store.dispatch(
+            SELECT_MUSIC_ACT,
             this.musicList[index].id,
           );
         }
@@ -78,28 +91,47 @@ export default {
       }
     },
 
+    // next music
     next() {
       const index = this.musicList.findIndex(item => item.id === this.currentId) + 1;
-      this.$store.commit(
-        SELECT_MUSIC,
+      this.$store.dispatch(
+        SELECT_MUSIC_ACT,
         this.musicList[index >= this.musicList.length ? 0 : index].id,
       );
     },
 
+    // next liked music
+    nextLike() {
+      const likedList = this.musicList.filter(item => item.liked);
+      if (!likedList.length) {
+        return;
+      }
+
+      const index = likedList.findIndex(item => item.id === this.currentId) + 1;
+      this.$store.dispatch(
+        SELECT_MUSIC_ACT,
+        likedList[index >= likedList.length ? 0 : index].id,
+      );
+    },
+
+    // prev music
     prev() {
       const index = this.musicList.findIndex(item => item.id === this.currentId) - 1;
-      this.$store.commit(
-        SELECT_MUSIC,
+      this.$store.dispatch(
+        SELECT_MUSIC_ACT,
         this.musicList[index < 0 ? this.musicList.length - 1 : index].id,
       );
     },
 
     loop() {
-      this.$refs.audio.loop = this.audioStatus.loop = !this.audioStatus.loop;
+      this.audioStatus.loop = (this.audioStatus.loop + 1) % loopCount;
+      this.$refs.audio.loop = this.audioStatus.loop === loopTypes.single;
+      this.$store.commit(UPDATE_CONFIG, { key: 'musicStatus.loop', value: this.audioStatus.loop });
     },
 
     mute() {
       this.$refs.audio.muted = this.audioStatus.muted = !this.audioStatus.muted;
+      this.$store.commit(UPDATE_CONFIG, { key: 'musicStatus.muted', value: this.audioStatus.muted });
     },
 
     simple() {
@@ -122,7 +154,11 @@ export default {
       gainnode.connect(AC.destination);
 
       audio.onended = () => {
-        this.next();
+        if (this.audioStatus.loop === loopTypes.normal) {
+          this.next();
+        } else if (this.audioStatus.loop === loopTypes.like) {
+          this.nextLike();
+        }
       };
 
       audio.ontimeupdate = () => {
@@ -152,12 +188,27 @@ export default {
         this.initCanvas();
       }, 400);
     },
+
+    syncStatus() {
+      Object.keys(this.audioStatus).forEach(key => {
+        const statusKey = `musicStatus.${key}`;
+        if (this.sourceConfig.hasOwnProperty(statusKey)) {
+          this.audioStatus[key] = this.sourceConfig[statusKey];
+        }
+      });
+    },
   },
   mounted() {
     this.initAudio();
     this.initCanvas();
+    this.syncStatus();
     loop(loopVm = this);
     win.on('resize', this.onResize.bind(this));
+    this.$nextTick(() => {
+      if (this.currentId) {
+        this.changeMusic(this.currentId);
+      }
+    });
   },
   destroyed() {
     if (this.bufferSource) {

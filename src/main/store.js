@@ -15,11 +15,14 @@ class Store {
 
   set(key, value) {
     this.config[key] = value;
-    try {
-      fs.writeFileSync(this.path, JSON.stringify(this.config));
-    } catch (e) {
-      console.error(e);
-    }
+    clearTimeout(this.saveTimeout);
+    this.saveTimeout = setTimeout(() => {
+      try {
+        fs.writeFileSync(this.path, JSON.stringify(this.config));
+      } catch (e) {
+        console.error(e);
+      }
+    }, 500);
   }
 }
 

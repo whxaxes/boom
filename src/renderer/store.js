@@ -12,20 +12,28 @@ const readFile = promisify(fs.readFile);
 const isFullScreen = remote.getCurrentWindow().isFullScreen();
 
 Vue.use(Vuex);
+
+// mutations
 export const SELECT_MUSIC = 'selectMusic';
+export const LIKE_MUSIC = 'likeMusic';
 export const DECODE_MUSIC = 'decodeMusic';
 export const UPDATE_PATH = 'updatePath';
 export const UPDATE_CONFIG = 'updateConfig';
 export const UPDATE_SIMPLE_MODE = 'updateSimpleMode';
 export const UPDATE_FULL_SCREEN = 'updateFullScreen';
 export const UPDATE_MUSIC_LIST = 'updateMusicList';
+
+// actions
 export const UPDATE_PATH_ACT = 'updatePathAction';
+export const LIKE_MUSIC_ACT = 'likeMusicAction';
+export const SELECT_MUSIC_ACT = 'selectMusicAction';
+
+// init store
 export const initStore = config => {
   let watcher;
   const store = new Vuex.Store({
     state: {
-      selectIndex: null,
-      currentId: null,
+      currentId: config[constant.CURRENT_ID],
       musicList: [],
       playStyle: 'column',
       sourceConfig: config,
@@ -35,6 +43,13 @@ export const initStore = config => {
     mutations: {
       [SELECT_MUSIC](state, id) {
         state.currentId = id;
+      },
+
+      [LIKE_MUSIC](state, { id, liked }) {
+        const music = state.musicList.find(item => item.id === id);
+        if (music) {
+          music.liked = liked;
+        }
       },
 
       [UPDATE_PATH](state, newPath) {
@@ -47,6 +62,7 @@ export const initStore = config => {
 
       [UPDATE_MUSIC_LIST](state) {
         const config = state.sourceConfig;
+        const likedList = state.sourceConfig[constant.LIKED_LIST] || [];
         state.musicList = fs.readdirSync(state.musicPath)
           .filter(f => (
             config.allowKeys.indexOf(path.extname(f)) >= 0
@@ -54,6 +70,7 @@ export const initStore = config => {
             id: f,
             url: `http://127.0.0.1:${config.port}/${f}`,
             name: path.basename(f, path.extname(f)),
+            liked: likedList.indexOf(f) >= 0,
           }));
       },
 
@@ -103,6 +120,26 @@ export const initStore = config => {
         commit(UPDATE_CONFIG, { key: constant.MUSIC_PATH, value: filePath });
         commit(UPDATE_MUSIC_LIST);
       },
+
+      [SELECT_MUSIC_ACT]({ state, commit }, arg) {
+        commit(SELECT_MUSIC, arg);
+        commit(UPDATE_CONFIG, {
+          key: constant.CURRENT_ID,
+          value: state.currentId,
+        });
+      },
+
+      [LIKE_MUSIC_ACT]({ state, commit }, arg) {
+        commit(LIKE_MUSIC, arg);
+
+        // update liked list
+        commit(UPDATE_CONFIG, {
+          key: constant.LIKED_LIST,
+          value: state.musicList
+            .filter(item => item.liked)
+            .map(item => item.id),
+        });
+      },
     },
   });
 
@@ -116,15 +153,6 @@ export const initStore = config => {
       store.commit(UPDATE_MUSIC_LIST);
     });
   }
-
-  const win = remote.getCurrentWindow();
-  win.on('enter-full-screen', () => {
-    store.commit(UPDATE_FULL_SCREEN, true);
-  });
-
-  win.on('leave-full-screen', () => {
-    store.commit(UPDATE_FULL_SCREEN, false);
-  });
 
   return store;
 };

@@ -163,6 +163,10 @@
     content: "\e6d7";
   }
 
+  .icon-heart:before {
+    content: "\e605";
+  }
+
   * {
     margin: 0;
     padding: 0;
@@ -199,7 +203,7 @@
     margin: auto;
   }
 
-  $leftWidth: 200px;
+  $leftWidth: 240px;
   .left-side,
   .fake-left-side {
     position: absolute;

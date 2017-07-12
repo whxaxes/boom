@@ -6,6 +6,7 @@
            crossorigin="anonymous"></audio>
     <div class="controll">
       <div class="audio-state">
+        <div class="music-name">{{ name }}</div>
         <div class="btn">
           <i class="iconfont icon-backwardfill"
              @click="prev"></i>
@@ -37,8 +38,12 @@
         </div>
         <div class="btn loop-button">
           <i class="iconfont icon-repeat"
-             @click="loop"
-             :class="{ active: audioStatus.loop }"></i>
+             @click="loop"></i>
+          <span class="single-symbol"
+                v-if="audioStatus.loop === loopTypes.single">1
+          </span>
+          <i class="iconfont icon-heart"
+             v-if="audioStatus.loop === loopTypes.like"></i>
         </div>
         <div class="btn simple-button">
           <i class="iconfont icon-simple"
@@ -92,6 +97,19 @@
     opacity: .6;
     transition: opacity .3s;
 
+    .music-name {
+      position: absolute;
+      width: 100%;
+      height: 30px;
+      line-height: 30px;
+      top: -30px;
+      color: #666;
+      font-size: 12px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
     .progress {
       width: 200px;
       height: 3px;
@@ -143,7 +161,19 @@
       }
     }
 
-    .loop-button,
+    .loop-button {
+      position: relative;
+
+      .single-symbol {
+        color: #fff;
+        font-size: 10px;
+      }
+
+      .icon-heart {
+        font-size: 8px;
+      }
+    }
+
     .simple-button {
       .iconfont {
         opacity: .3;

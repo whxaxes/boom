@@ -1,18 +1,26 @@
 <template>
-  <div class="music-list">
-    <div class="music-scroller">
+  <div class="music-list"
+       ref="musicList">
+    <div class="music-scroller"
+         ref="musicScroller">
       <div class="music-item"
+           ref="musicItem"
            v-for="item in musicList"
            :class="{ playing: currentId === item.id }"
            @click="select(item.id)">
-        {{ item.name }}
+        <div class="music-name">
+          <i class="iconfont icon-heart"
+             @click.stop="like(item.id, !item.liked)"
+             :class="{ active: item.liked }"></i>
+          {{ item.name }}
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script type="text/babel">
-  import { SELECT_MUSIC } from '~/store';
+  import { SELECT_MUSIC_ACT, LIKE_MUSIC_ACT } from '~/store';
   import { mapState } from 'vuex';
   export default {
     name: 'music-list',
@@ -25,9 +33,29 @@
         'musicList',
       ]),
     },
+    watch: {
+      currentId() {
+        this.updatePosition();
+      },
+    },
     methods: {
+      updatePosition() {
+//        const index = this.musicList.findIndex(item => item.id === this.currentId);
+//        if (index < 0) {
+//          return;
+//        }
+//
+//        const rect = this.$refs.musicItem[index].getBoundingClientRect();
+//        const scroller = this.$refs.musicScroller;
+//        const scrollTop = scroller.scrollTop;
+      },
+
       select(id) {
-        this.$store.commit(SELECT_MUSIC, id);
+        this.$store.dispatch(SELECT_MUSIC_ACT, id);
+      },
+
+      like(id, liked) {
+        this.$store.dispatch(LIKE_MUSIC_ACT, { id, liked });
       },
     },
   };
@@ -58,17 +86,14 @@
   }
 
   .music-item {
+    position: relative;
     display: block;
     width: 100%;
     height: 40px;
     line-height: 40px;
     padding-right: 20px;
-    text-indent: 10px;
     font-size: 12px;
     cursor: pointer;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
     color: rgba(255, 255, 255, .4);
     -webkit-transition: background-color .3s, padding .3s;
     transition: background-color .3s, padding .3s;
@@ -85,6 +110,25 @@
     &.playing {
       color: #fff;
       background-color: rgba(0, 0, 0, .8);
+    }
+  }
+
+  .music-name {
+    position: relative;
+    text-indent: 10px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    .icon-heart {
+      margin-right: 5px;
+      opacity: .5;
+      font-size: 14px;
+      color: rgba(255, 255, 255, .4);
+
+      &.active {
+        color: #f00;
+      }
     }
   }
 </style>
