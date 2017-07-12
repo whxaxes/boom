@@ -1,6 +1,8 @@
 import { mapState } from 'vuex';
+import { remote } from 'electron';
 import { SELECT_MUSIC, UPDATE_SIMPLE_MODE } from '~/store';
 import styles from './styles';
+const win = remote.getCurrentWindow();
 const AC = new window.AudioContext();
 const analyser = AC.createAnalyser();
 const gainnode = AC.createGain();
@@ -136,20 +138,33 @@ export default {
         this.audioStatus.playing = false;
       };
     },
+
+    initCanvas() {
+      const canvas = this.$refs.canvas;
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+      styles[this.playStyle].init(canvas);
+    },
+
+    onResize() {
+      clearTimeout(this.resizeTimeout);
+      this.resizeTimeout = setTimeout(() => {
+        this.initCanvas();
+      }, 400);
+    },
   },
   mounted() {
     this.initAudio();
-    const canvas = this.$refs.canvas;
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
-    styles[this.playStyle].init(canvas);
+    this.initCanvas();
     loop(loopVm = this);
+    win.on('resize', this.onResize.bind(this));
   },
   destroyed() {
     if (this.bufferSource) {
       this.bufferSource.stop();
     }
 
+    win.removeListener('resize', this.onResize.bind(this));
     loopVm = null;
   },
 };

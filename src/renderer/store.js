@@ -3,30 +3,34 @@ import path from 'path';
 import Vue from 'vue';
 import Vuex from 'vuex';
 import promisify from 'es6-promisify';
-import { ipcRenderer } from 'electron';
+import { ipcRenderer, remote } from 'electron';
+import chokidar from 'chokidar';
 import constant from 'constant';
 
 const AC = new window.AudioContext();
 const readFile = promisify(fs.readFile);
+const isFullScreen = remote.getCurrentWindow().isFullScreen();
 
 Vue.use(Vuex);
 export const SELECT_MUSIC = 'selectMusic';
 export const DECODE_MUSIC = 'decodeMusic';
 export const UPDATE_PATH = 'updatePath';
-export const UPDATE_MUSIC = 'updateMusic';
 export const UPDATE_CONFIG = 'updateConfig';
 export const UPDATE_SIMPLE_MODE = 'updateSimpleMode';
 export const UPDATE_FULL_SCREEN = 'updateFullScreen';
+export const UPDATE_MUSIC_LIST = 'updateMusicList';
+export const UPDATE_PATH_ACT = 'updatePathAction';
 export const initStore = config => {
-  return new Vuex.Store({
+  let watcher;
+  const store = new Vuex.Store({
     state: {
       selectIndex: null,
       currentId: null,
       musicList: [],
       playStyle: 'column',
       sourceConfig: config,
-      simpleMode: false,
-      isFullScreen: false,
+      simpleMode: isFullScreen,
+      isFullScreen,
     },
     mutations: {
       [SELECT_MUSIC](state, id) {
@@ -35,22 +39,22 @@ export const initStore = config => {
 
       [UPDATE_PATH](state, newPath) {
         if (!fs.existsSync(newPath)) {
-          return false;
+          return;
         }
 
-        const config = state.sourceConfig;
         state.musicPath = newPath;
-        state.musicList = fs.readdirSync(newPath).filter(f => (
-          config.allowKeys.indexOf(path.extname(f)) >= 0
-        )).map(f => ({
-          id: f,
-          url: `http://127.0.0.1:${config.port}/${f}`,
-          name: path.basename(f, path.extname(f)),
-        }));
       },
 
-      [UPDATE_MUSIC](state, music) {
-        state.musicList = state.musicList.concat(music);
+      [UPDATE_MUSIC_LIST](state) {
+        const config = state.sourceConfig;
+        state.musicList = fs.readdirSync(state.musicPath)
+          .filter(f => (
+            config.allowKeys.indexOf(path.extname(f)) >= 0
+          )).map(f => ({
+            id: f,
+            url: `http://127.0.0.1:${config.port}/${f}`,
+            name: path.basename(f, path.extname(f)),
+          }));
       },
 
       [UPDATE_CONFIG](state, { key, value }) {
@@ -84,6 +88,43 @@ export const initStore = config => {
             console.log(`decode error：${e.message}`);
           });
       },
+
+      [UPDATE_PATH_ACT]({ state, commit }, filePath) {
+        commit(UPDATE_PATH, filePath);
+        if (state.musicPath !== filePath) {
+          return;
+        }
+
+        if (watcher) {
+          watcher.close();
+        }
+
+        watcherBind(watcher = chokidar.watch(filePath));
+        commit(UPDATE_CONFIG, { key: constant.MUSIC_PATH, value: filePath });
+        commit(UPDATE_MUSIC_LIST);
+      },
     },
   });
+
+  // watch music dir
+  function watcherBind() {
+    watcher.on('add', () => {
+      store.commit(UPDATE_MUSIC_LIST);
+    }).on('unlink', () => {
+      store.commit(UPDATE_MUSIC_LIST);
+    }).on('change', () => {
+      store.commit(UPDATE_MUSIC_LIST);
+    });
+  }
+
+  const win = remote.getCurrentWindow();
+  win.on('enter-full-screen', () => {
+    store.commit(UPDATE_FULL_SCREEN, true);
+  });
+
+  win.on('leave-full-screen', () => {
+    store.commit(UPDATE_FULL_SCREEN, false);
+  });
+
+  return store;
 };

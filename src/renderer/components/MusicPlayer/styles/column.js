@@ -44,9 +44,8 @@ class Column {
 }
 
 export default {
-  columnList: [],
-
   init(canvas) {
+    this.columnList = [];
     this._canvas = document.createElement('canvas');
     this._canvas.width = canvas.width;
     this._canvas.height = canvas.height / 2;
@@ -98,7 +97,10 @@ export default {
 
     // split column
     for (let i = 0; i < this.num; i++) {
-      this._ctx.clearRect(0, this.start + i * FULL_H, this.canvas.width, SPLIT_DIS);
+      this._ctx.clearRect(
+        0, this.start + i * FULL_H - 0.1,
+        this.canvas.width, SPLIT_DIS + 0.1
+      );
     }
 
     // draw red box

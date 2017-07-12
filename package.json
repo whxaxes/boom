@@ -54,6 +54,7 @@
   },
   "dependencies": {
     "axios": "^0.16.1",
+    "chokidar": "^1.7.0",
     "es6-promisify": "^5.0.0",
     "promise.prototype.finally": "^2.0.1",
     "vue": "^2.3.3",

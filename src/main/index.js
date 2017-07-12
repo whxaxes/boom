@@ -16,7 +16,7 @@ import constant from '../constant';
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
  */
 if (process.env.NODE_ENV !== 'development') {
-  global.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\') // eslint-disable-line
+  global.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\');
 }
 
 let mainWindow;
@@ -28,9 +28,9 @@ const allowFiles = { '.mp3': 'audio/mpeg', '.wav': 'audio/wav' };
 const allowKeys = Object.keys(allowFiles);
 
 function createWindow() {
-  const { width, height } = screen.getPrimaryDisplay().workAreaSize;
   mainWindow = new BrowserWindow({
-    height, width,
+    width: 1000,
+    height: 600,
     useContentSize: true,
     titleBarStyle: 'hidden-inset',
     frame: false,

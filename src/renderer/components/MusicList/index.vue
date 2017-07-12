@@ -64,6 +64,7 @@
     line-height: 40px;
     padding-right: 20px;
     text-indent: 10px;
+    font-size: 12px;
     cursor: pointer;
     overflow: hidden;
     white-space: nowrap;
@@ -71,6 +72,10 @@
     color: rgba(255, 255, 255, .4);
     -webkit-transition: background-color .3s, padding .3s;
     transition: background-color .3s, padding .3s;
+
+    &:nth-child(2n) {
+      background-color: rgba(0, 0, 0, .2);
+    }
 
     &:hover {
       padding-left: 5px;

@@ -28,13 +28,13 @@
   import { ipcRenderer, remote } from 'electron';
   import { mapState } from 'vuex';
   import {
-      UPDATE_PATH,
-      UPDATE_CONFIG,
+      UPDATE_PATH_ACT,
       UPDATE_FULL_SCREEN,
   } from './store';
   import constant from 'constant';
   import MusicList from '~/components/MusicList';
   import MusicPlayer from '~/components/MusicPlayer';
+  const win = remote.getCurrentWindow();
 
   export default {
     name: 'boom',
@@ -73,11 +73,7 @@
           return;
         }
 
-        this.$store.commit(UPDATE_PATH, this.musicPath);
-        this.$store.commit(UPDATE_CONFIG, {
-          key: constant.MUSIC_PATH,
-          value: this.musicPath,
-        });
+        this.$store.dispatch(UPDATE_PATH_ACT, this.musicPath);
       },
 
       listen() {
@@ -85,20 +81,19 @@
           this.showDialog = true;
         });
 
-        const win = remote.getCurrentWindow();
-        win.on('enter-full-screen', () => {
-          this.$store.commit(UPDATE_FULL_SCREEN, true);
-        });
+        win.on('enter-full-screen', this.onFullScreen.bind(this, true));
+        win.on('leave-full-screen', this.onFullScreen.bind(this, false));
+        window.addEventListener('keyup', this.onKeyUp.bind(this));
+      },
 
-        win.on('leave-full-screen', () => {
-          this.$store.commit(UPDATE_FULL_SCREEN, false);
-        });
+      onFullScreen(isFullscreen) {
+        this.$store.commit(UPDATE_FULL_SCREEN, isFullscreen);
+      },
 
-        window.addEventListener('keyup', e => {
-          if (e.keyCode === 27) {
-            this.showDialog = false;
-          }
-        });
+      onKeyUp(e) {
+        if (e.keyCode === 27) {
+          this.showDialog = false;
+        }
       },
     },
     mounted() {
@@ -108,10 +103,15 @@
       if (!musicPath || !dirNotExist) {
         this.showDialog = true;
       } else {
-        this.$store.commit(UPDATE_PATH, this.musicPath);
+        this.$store.dispatch(UPDATE_PATH_ACT, this.musicPath);
       }
 
       this.listen();
+    },
+    destroyed() {
+      win.removeListener('enter-full-screen', this.onFullScreen.bind(this, true));
+      win.removeListener('leave-full-screen', this.onFullScreen.bind(this, false));
+      window.removeEventListener('keyup', this.onKeyUp.bind(this));
     },
   };
 </script>
@@ -182,6 +182,11 @@
     width: 100%;
     height: 100%;
     overflow: hidden;
+  }
+
+  body {
+    color: #333;
+    font-family: "PingFangSC-Light", "Hiragino Sans GB", "Microsoft YaHei", sans-serif, "黑体";
   }
 
   #app {
