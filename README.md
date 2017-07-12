@@ -2,8 +2,6 @@
 
 > A music player base on electron-vue
 
-It's not finished yet
-
 #### Build Setup
 
 ``` bash
@@ -19,7 +17,6 @@ npm run build
 
 # lint all JS/Vue component files in `src/`
 npm run lint
-
 ```
 
 ![](./image.png)
