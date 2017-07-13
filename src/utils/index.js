@@ -34,14 +34,8 @@ export default {
     }
 
     this.watcher = chokidar.watch(dir, { depth })
-      .on('add', () => {
-        callback();
-      })
-      .on('unlink', () => {
-        callback();
-      })
-      .on('change', () => {
-        callback();
-      });
+      .on('add', callback)
+      .on('unlink', callback)
+      .on('change', callback);
   },
 };
