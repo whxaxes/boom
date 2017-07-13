@@ -14,10 +14,29 @@ npm run dev
 # build electron application for production
 npm run build
 
-
 # lint all JS/Vue component files in `src/`
 npm run lint
 ```
+
+#### Release
+
+```bash
+# install packager
+npm install electron-packager -g
+
+# pack
+npm run pack && electron-packager . --overwrite
+
+# move to Applications and enjoy it
+mv ./boom-darwin-x64/boom.app /Applications
+```
+
+#### Configure
+
+Default music directory is `~/Music`, click `boom => Preferences` and change it.
+
+
+#### Preview
 
 ![](./image.png)
 
