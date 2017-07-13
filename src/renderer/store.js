@@ -10,6 +10,7 @@ import utils from '~utils';
 const AC = new window.AudioContext();
 const readFile = promisify(fs.readFile);
 const isFullScreen = remote.getCurrentWindow().isFullScreen();
+let watcher;
 
 Vue.use(Vuex);
 
@@ -119,8 +120,14 @@ export const initStore = config => {
         commit(UPDATE_CONFIG, { key: constant.MUSIC_PATH, value: filePath });
         commit(UPDATE_MUSIC_LIST);
 
+        // if watcher already exist, close it.
+        // make sure there is only one watcher
+        if (watcher) {
+          watcher.close();
+        }
+
         // watch and update file list
-        utils.watch(filePath, () => {
+        watcher = utils.watch(filePath, () => {
           commit(UPDATE_MUSIC_LIST);
         });
       },

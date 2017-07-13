@@ -29,11 +29,7 @@ export default {
   },
 
   watch(dir, callback, depth = 3) {
-    if (this.watcher) {
-      this.watcher.close();
-    }
-
-    this.watcher = chokidar.watch(dir, { depth })
+    return chokidar.watch(dir, { depth })
       .on('add', callback)
       .on('unlink', callback)
       .on('change', callback);
