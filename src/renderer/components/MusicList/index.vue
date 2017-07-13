@@ -1,11 +1,12 @@
 <template>
-  <div class="music-list"
-       ref="musicList">
+  <div class="music-list">
     <div class="music-scroller"
-         ref="musicScroller">
+         ref="musicScroller"
+         @wheel.passive="clearScrollAnimate">
       <div class="music-item"
            ref="musicItem"
            v-for="item in musicList"
+           :key="item.id"
            :class="{ playing: currentId === item.id }"
            @click="select(item.id)">
         <div class="music-name">
@@ -20,45 +21,8 @@
 </template>
 
 <script type="text/babel">
-  import { SELECT_MUSIC_ACT, LIKE_MUSIC_ACT } from '~/store';
-  import { mapState } from 'vuex';
-  export default {
-    name: 'music-list',
-    data() {
-      return {};
-    },
-    computed: {
-      ...mapState([
-        'currentId',
-        'musicList',
-      ]),
-    },
-    watch: {
-      currentId() {
-        this.updatePosition();
-      },
-    },
-    methods: {
-      updatePosition() {
-//        const index = this.musicList.findIndex(item => item.id === this.currentId);
-//        if (index < 0) {
-//          return;
-//        }
-//
-//        const rect = this.$refs.musicItem[index].getBoundingClientRect();
-//        const scroller = this.$refs.musicScroller;
-//        const scrollTop = scroller.scrollTop;
-      },
-
-      select(id) {
-        this.$store.dispatch(SELECT_MUSIC_ACT, id);
-      },
-
-      like(id, liked) {
-        this.$store.dispatch(LIKE_MUSIC_ACT, { id, liked });
-      },
-    },
-  };
+  import vm from './vm';
+  export default vm;
 </script>
 
 <style lang="scss" rel="stylesheet/scss">
@@ -66,14 +30,14 @@
     height: 100%;
     overflow: hidden;
   }
-
+  
   .fullscreen {
     .music-scroller {
       transform: translateY(0);
       border-bottom: 0;
     }
   }
-
+  
   .music-scroller {
     width: 100%;
     height: 100%;
@@ -84,7 +48,7 @@
     transform: translateY(30px);
     border-bottom: 30px solid transparent;
   }
-
+  
   .music-item {
     position: relative;
     display: block;
@@ -97,35 +61,35 @@
     color: rgba(255, 255, 255, .4);
     -webkit-transition: background-color .3s, padding .3s;
     transition: background-color .3s, padding .3s;
-
+  
     &:nth-child(2n) {
       background-color: rgba(0, 0, 0, .2);
     }
-
+  
     &:hover {
       padding-left: 5px;
       color: #fff;
     }
-
+  
     &.playing {
       color: #fff;
       background-color: rgba(0, 0, 0, .8);
     }
   }
-
+  
   .music-name {
     position: relative;
     text-indent: 10px;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-
+  
     .icon-heart {
       margin-right: 5px;
       opacity: .5;
       font-size: 14px;
       color: rgba(255, 255, 255, .4);
-
+  
       &.active {
         color: #f00;
       }

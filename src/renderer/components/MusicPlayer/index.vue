@@ -2,6 +2,7 @@
   <div class="music-player">
     <canvas ref="canvas"></canvas>
     <audio ref="audio"
+           preload
            :src="url"
            crossorigin="anonymous"></audio>
     <div class="controll">
@@ -16,14 +17,15 @@
              :class="{
               'icon-playfill': !audioStatus.playing,
               'icon-stop': audioStatus.playing 
-             }"
+              }"
              @click="play"></i>
         </div>
         <div class="btn">
           <i class="iconfont icon-play_forward_fill"
              @click="next"></i>
         </div>
-        <div class="progress">
+        <div class="progress"
+             @click="changeTime">
           <div class="progress-bar"
                :style="progress"></div>
         </div>
@@ -33,8 +35,7 @@
              :class="{
               'icon-notificationforbidfill': audioStatus.muted,
               'icon-notificationfill': !audioStatus.muted,
-             }"
-          ></i>
+              }"></i>
         </div>
         <div class="btn loop-button">
           <i class="iconfont icon-repeat"
@@ -60,28 +61,28 @@
     width: 100%;
     height: 100%;
   }
-
+  
   .music-player {
     position: relative;
   }
-
+  
   .controll {
     position: absolute;
     width: 100%;
     height: 220px;
     bottom: 0;
-
+  
     &:hover .audio-state {
       opacity: 1;
     }
   }
-
+  
   .simple-mode {
     .audio-state {
       opacity: 0;
     }
   }
-
+  
   .audio-state {
     position: absolute;
     width: 440px;
@@ -96,7 +97,7 @@
     align-items: center;
     opacity: .6;
     transition: opacity .3s;
-
+  
     .music-name {
       position: absolute;
       width: 100%;
@@ -109,28 +110,43 @@
       white-space: nowrap;
       text-overflow: ellipsis;
     }
-
+  
     .progress {
+      position: relative;
       width: 200px;
-      height: 3px;
+      height: 10px;
       float: left;
       margin: 0 10px;
-      background-color: #000;
-
+      cursor: pointer;
+  
+      &:before,
+      .progress-bar {
+        pointer-events: none;
+        content: '';
+        position: absolute;
+        height: 3px;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        margin: auto;
+        background-color: #000;
+      }
+  
       .progress-bar {
         width: 0;
-        height: 100%;
+        right: auto;
         background-color: #333;
       }
     }
-
+  
     .iconfont {
       display: flex;
       font-size: 20px;
       color: #ccc;
       transition: color .3s;
     }
-
+  
     .btn {
       width: 40px;
       height: 40px;
@@ -140,50 +156,50 @@
       align-items: center;
       justify-content: center;
       box-sizing: border-box;
-
+  
       &:hover .iconfont {
         color: #fff;
       }
     }
-
+  
     .play-button {
       border: 1px solid #000;
       border-radius: 100%;
       background-color: #000;
-
+  
       .iconfont {
         font-size: 26px;
       }
-
+  
       .icon-playfill {
         position: relative;
         left: 2px;
       }
     }
-
+  
     .loop-button {
       position: relative;
-
+  
       .single-symbol {
         color: #fff;
         font-size: 10px;
       }
-
+  
       .icon-heart {
         font-size: 8px;
       }
     }
-
+  
     .simple-button {
       .iconfont {
         opacity: .3;
       }
-
+  
       .icon-simple {
         position: relative;
         top: -2px;
       }
-
+  
       .active {
         opacity: 1;
       }

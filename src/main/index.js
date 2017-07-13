@@ -4,9 +4,10 @@ import {
   BrowserWindow,
   ipcMain,
 } from 'electron';
-import http from 'http';
-import path from 'path';
-import fs from 'fs';
+const http = require('http');
+const path = require('path');
+const fs = require('fs');
+const ms = require('mediaserver');
 import menu from './menu';
 import store from './store';
 import constant from '../constant';
@@ -20,9 +21,9 @@ if (process.env.NODE_ENV !== 'development') {
 }
 
 let mainWindow;
-const winURL = process.env.NODE_ENV === 'development'
-  ? 'http://localhost:9080'
-  : `file://${__dirname}/index.html`;
+const winURL = process.env.NODE_ENV === 'development' ?
+  'http://localhost:9080' :
+  `file://${__dirname}/index.html`;
 
 const allowFiles = { '.mp3': 'audio/mpeg', '.wav': 'audio/wav' };
 const allowKeys = Object.keys(allowFiles);
@@ -40,7 +41,8 @@ function createWindow() {
   startMusicServer(port => {
     ipcMain.on(constant.VIEW_READY, event => {
       event.sender.send(constant.INIT_CONFIG, Object.assign(store.config, {
-        port, allowKeys,
+        port,
+        allowKeys,
       }));
     });
 
@@ -75,16 +77,7 @@ function startMusicServer(callback) {
       return notFound(res);
     }
 
-    const stat = fs.lstatSync(fileUrl);
-    const source = fs.createReadStream(fileUrl);
-    res.writeHead(200, {
-      'Content-Type': allowFiles[extname],
-      'Content-Length': stat.size,
-      'Access-Control-Allow-Origin': '*',
-      'Cache-Control': 'max-age=' + (365 * 24 * 60 * 60 * 1000),
-      'Last-Modified': String(stat.mtime).replace(/\([^\x00-\xff]+\)/g, '').trim(),
-    });
-    source.pipe(res);
+    ms.pipe(req, res, fileUrl);
   }).listen(0, () => {
     callback(server.address().port);
   });

@@ -25,7 +25,6 @@ export default {
       audioStatus: {
         currentTime: 0,
         duration: 0,
-        playing: false,
         loop: loopTypes.like,
         muted: false,
       },
@@ -45,9 +44,8 @@ export default {
     progress() {
       const status = this.audioStatus;
       return {
-        width: status.currentTime
-          ? Math.ceil((status.currentTime / status.duration) * 100) + '%'
-          : '0',
+        width: status.currentTime ?
+          Math.ceil((status.currentTime / status.duration) * 100) + '%' : '0',
       };
     },
 
@@ -145,6 +143,22 @@ export default {
       this.$store.commit(UPDATE_SIMPLE_MODE, !this.simpleMode);
     },
 
+    // change play time
+    changeTime(e) {
+      if (!this.url) {
+        return;
+      }
+
+      const rect = e.currentTarget.getBoundingClientRect();
+      const len = e.pageX - rect.left;
+      const ratio = len / rect.width;
+      this.$refs.audio.play();
+      // use timeout to make sure audio has playing
+      setTimeout(() => {
+        this.$refs.audio.currentTime = ratio * this.audioStatus.duration;
+      });
+    },
+
     // executed in every animation frame
     animate() {
       const arrayLength = analyser.frequencyBinCount;
@@ -163,7 +177,9 @@ export default {
       analyser.connect(gainnode);
       gainnode.connect(AC.destination);
 
-      audio.onended = () => {
+      let endTimeout;
+      const onEnd = () => {
+        clearTimeout(endTimeout);
         if (this.audioStatus.loop === loopTypes.normal) {
           this.next();
         } else if (this.audioStatus.loop === loopTypes.like) {
@@ -171,17 +187,25 @@ export default {
         }
       };
 
+      audio.onended = () => { onEnd(); };
+
       audio.ontimeupdate = () => {
+        clearTimeout(endTimeout);
         this.audioStatus.currentTime = audio.currentTime;
+        const lessTime = this.audioStatus.duration - this.audioStatus.currentTime;
+        // end event would not be fired while currentTime changed
+        // so use timeout to fire end event.
+        if (this.audioStatus.duration && lessTime < 2) {
+          endTimeout = setTimeout(() => { onEnd(); }, lessTime * 1000 + 100);
+        }
       };
 
-      audio.onplaying = () => {
-        this.audioStatus.playing = true;
+      audio.oncanplay = () => {
         this.audioStatus.duration = audio.duration;
       };
 
       audio.onpause = () => {
-        this.audioStatus.playing = false;
+        clearTimeout(endTimeout);
       };
     },
 

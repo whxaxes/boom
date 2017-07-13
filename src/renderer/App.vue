@@ -1,14 +1,15 @@
 <template>
   <div id="app"
        :class="{
-         'fullscreen': isFullScreen,
-         'simple-mode': simpleMode
-       }">
+           'fullscreen': isFullScreen,
+           'simple-mode': simpleMode
+         }">
     <div class="title-bar"></div>
     <div class="fake-left-side"></div>
     <music-list class="left-side"></music-list>
     <music-player class="right-side"></music-player>
-    <div class="dialog" v-if="showDialog">
+    <div class="dialog"
+         v-if="showDialog">
       <div class="dialog-mask"
            @click="showDialog = false"></div>
       <div class="dialog-content">
@@ -28,8 +29,8 @@
   import { ipcRenderer, remote } from 'electron';
   import { mapState } from 'vuex';
   import {
-      UPDATE_PATH_ACT,
-      UPDATE_FULL_SCREEN,
+    UPDATE_PATH_ACT,
+    UPDATE_FULL_SCREEN,
   } from './store';
   import constant from 'constant';
   import MusicList from '~/components/MusicList';
@@ -121,7 +122,7 @@
     src: url('./assets/iconfont.woff') format('woff'),
     url('./assets/iconfont.ttf') format('truetype');
   }
-
+  
   .iconfont {
     font-family: "iconfont" !important;
     font-size: 16px;
@@ -129,48 +130,48 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-
+  
   .icon-simple:before {
     content: "\e600";
   }
-
+  
   .icon-notificationfill:before {
     content: "\e66a";
   }
-
+  
   .icon-notificationforbidfill:before {
     content: "\e6db";
   }
-
+  
   .icon-backwardfill:before {
     content: "\e74d";
   }
-
+  
   .icon-playfill:before {
     content: "\e74f";
   }
-
+  
   .icon-stop:before {
     content: "\e750";
   }
-
+  
   .icon-play_forward_fill:before {
     content: "\e7f5";
   }
-
+  
   .icon-repeat:before {
     content: "\e6d7";
   }
-
+  
   .icon-heart:before {
     content: "\e605";
   }
-
+  
   * {
     margin: 0;
     padding: 0;
   }
-
+  
   .title-bar {
     position: absolute;
     left: 0;
@@ -180,23 +181,26 @@
     z-index: 999;
     -webkit-app-region: drag;
   }
-
-  html, body {
+  
+  html,
+  body {
     width: 100%;
     height: 100%;
     overflow: hidden;
   }
-
+  
   body {
     color: #333;
     font-family: "PingFangSC-Light", "Hiragino Sans GB", "Microsoft YaHei", sans-serif, "黑体";
   }
-
-  input, textarea, button {
+  
+  input,
+  textarea,
+  button {
     outline: none;
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   }
-
+  
   #app {
     position: absolute;
     background-color: #000;
@@ -206,7 +210,7 @@
     right: 0;
     margin: auto;
   }
-
+  
   $leftWidth: 240px;
   .left-side,
   .fake-left-side {
@@ -219,43 +223,41 @@
     background-color: rgba(255, 255, 255, .1);
     z-index: 2;
     transition: transform .3s;
-  }
-
-  // use to show left-side in simple-mode
+  } // use to show left-side in simple-mode
   .fake-left-side {
     pointer-events: none;
     background-color: transparent;
   }
-
+  
   .right-side {
     margin-left: $leftWidth;
     height: 100%;
     transition: transform .3s;
   }
-
+  
   .simple-mode {
     .left-side {
       transform: translateX(-$leftWidth);
-
+  
       &:hover {
         transform: translateX(0);
       }
     }
-
+  
     .fake-left-side {
       pointer-events: auto;
-
-      &:hover + .left-side {
+  
+      &:hover+.left-side {
         transition: transform .3s .3s;
         transform: translateX(0);
       }
     }
-
+  
     .right-side {
       transform: translateX(-$leftWidth/2);
     }
   }
-
+  
   .dialog {
     position: absolute;
     top: 0;
@@ -264,7 +266,7 @@
     right: 0;
     margin: auto;
     z-index: 100;
-
+  
     .dialog-mask {
       position: absolute;
       width: 100%;
@@ -274,7 +276,7 @@
       background-color: #000;
       opacity: .7;
     }
-
+  
     .dialog-content {
       position: absolute;
       width: 500px;
@@ -286,12 +288,12 @@
       margin: auto;
       background-color: #eee;
     }
-
+  
     .input {
       display: block;
       margin: 20px;
       height: 40px;
-
+  
       input {
         width: 100%;
         height: 100%;
@@ -303,7 +305,7 @@
         outline: none;
       }
     }
-
+  
     button {
       display: block;
       width: $leftWidth;
@@ -312,7 +314,7 @@
       border: 1px solid #ddd;
       background-color: #fff;
       border-radius: 4px;
-
+  
       &:hover {
         background-color: #eee;
       }
