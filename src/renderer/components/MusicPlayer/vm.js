@@ -25,6 +25,7 @@ export default {
       audioStatus: {
         currentTime: 0,
         duration: 0,
+        playing: false,
         loop: loopTypes.like,
         muted: false,
       },
@@ -204,8 +205,13 @@ export default {
         this.audioStatus.duration = audio.duration;
       };
 
+      audio.onplaying = () => {
+        this.audioStatus.playing = true;
+      };
+
       audio.onpause = () => {
         clearTimeout(endTimeout);
+        this.audioStatus.playing = false;
       };
     },
 
