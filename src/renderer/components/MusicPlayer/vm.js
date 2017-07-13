@@ -6,13 +6,13 @@ import {
   UPDATE_CONFIG,
 } from '~/store';
 import styles from './styles';
+import stage from '~/lib/stage';
 const win = remote.getCurrentWindow();
 const AC = new window.AudioContext();
 const analyser = AC.createAnalyser();
 const gainnode = AC.createGain();
 const loopTypes = { normal: 0, single: 1, like: 2 };
 const loopCount = Object.keys(loopTypes).length;
-let loopVm;
 gainnode.gain.value = 1;
 
 export default {
@@ -50,38 +50,38 @@ export default {
           : '0',
       };
     },
+
+    musicIndex() {
+      return this.musicList.findIndex(item => item.id === this.currentId);
+    },
   },
   watch: {
-    currentId(id) {
-      this.changeMusic(id, true);
+    currentId() {
+      this.changeMusic(true);
     },
   },
   methods: {
-    changeMusic(id, play) {
-      const music = this.musicList.find(item => item.id === id);
-      if (music) {
-        this.url = music.url;
-        this.name = music.name;
-        if (play) {
-          this.$nextTick(() => {
-            this.$refs.audio.load();
-            this.$refs.audio.play();
-          });
-        }
+    changeMusic(play) {
+      const music = this.musicList[this.musicIndex];
+      if (!music) {
+        return;
+      }
+
+      // update music
+      this.url = music.url;
+      this.name = music.name;
+
+      if (play) {
+        this.$nextTick(() => {
+          this.$refs.audio.load();
+          this.$refs.audio.play();
+        });
       }
     },
 
     play() {
       if (!this.url) {
-        if (this.musicList.length) {
-          const index = ~~(this.musicList.length * Math.random());
-          this.$store.dispatch(
-            SELECT_MUSIC_ACT,
-            this.musicList[index].id,
-          );
-        }
-
-        return;
+        return this.next();
       }
 
       if (this.$refs.audio.paused) {
@@ -93,7 +93,7 @@ export default {
 
     // next music
     next() {
-      const index = this.musicList.findIndex(item => item.id === this.currentId) + 1;
+      const index = this.musicIndex + 1;
       this.$store.dispatch(
         SELECT_MUSIC_ACT,
         this.musicList[index >= this.musicList.length ? 0 : index].id,
@@ -102,21 +102,28 @@ export default {
 
     // next liked music
     nextLike() {
-      const likedList = this.musicList.filter(item => item.liked);
-      if (!likedList.length) {
-        return;
+      const index = this.musicIndex;
+      const len = this.musicList.length;
+      let i = index;
+      // found next liked music
+      while (++i !== index) {
+        if (this.musicList[i = i >= len ? 0 : i].liked) {
+          break;
+        }
       }
 
-      const index = likedList.findIndex(item => item.id === this.currentId) + 1;
-      this.$store.dispatch(
-        SELECT_MUSIC_ACT,
-        likedList[index >= likedList.length ? 0 : index].id,
-      );
+      if (i === index) {
+        // replay music if can't found next liked music
+        this.$refs.audio.currentTime = 0;
+        this.$refs.audio.play();
+      } else {
+        this.$store.dispatch(SELECT_MUSIC_ACT, this.musicList[i].id);
+      }
     },
 
     // prev music
     prev() {
-      const index = this.musicList.findIndex(item => item.id === this.currentId) - 1;
+      const index = this.musicIndex - 1;
       this.$store.dispatch(
         SELECT_MUSIC_ACT,
         this.musicList[index < 0 ? this.musicList.length - 1 : index].id,
@@ -138,8 +145,11 @@ export default {
       this.$store.commit(UPDATE_SIMPLE_MODE, !this.simpleMode);
     },
 
+    // executed in every animation frame
     animate() {
       const arrayLength = analyser.frequencyBinCount;
+      // get frequency from analyser node
+      // frequency value is 0 ~ 255
       const array = new Uint8Array(arrayLength);
       analyser.getByteFrequencyData(array);
       styles[this.playStyle].update(array);
@@ -183,6 +193,7 @@ export default {
     },
 
     onResize() {
+      // recalculate canvas size while window's size changed
       clearTimeout(this.resizeTimeout);
       this.resizeTimeout = setTimeout(() => {
         this.initCanvas();
@@ -190,6 +201,7 @@ export default {
     },
 
     syncStatus() {
+      // read play status from cache
       Object.keys(this.audioStatus).forEach(key => {
         const statusKey = `musicStatus.${key}`;
         if (this.sourceConfig.hasOwnProperty(statusKey)) {
@@ -202,11 +214,11 @@ export default {
     this.initAudio();
     this.initCanvas();
     this.syncStatus();
-    loop(loopVm = this);
+    stage.add(this);
     win.on('resize', this.onResize.bind(this));
     this.$nextTick(() => {
       if (this.currentId) {
-        this.changeMusic(this.currentId);
+        this.changeMusic();
       }
     });
   },
@@ -216,15 +228,5 @@ export default {
     }
 
     win.removeListener('resize', this.onResize.bind(this));
-    loopVm = null;
   },
 };
-
-function loop() {
-  if (!loopVm) {
-    return;
-  }
-
-  loopVm.animate();
-  window.requestAnimationFrame(loop);
-}
