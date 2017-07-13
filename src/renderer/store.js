@@ -4,8 +4,8 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import promisify from 'es6-promisify';
 import { ipcRenderer, remote } from 'electron';
-import chokidar from 'chokidar';
 import constant from 'constant';
+import utils from '~utils';
 
 const AC = new window.AudioContext();
 const readFile = promisify(fs.readFile);
@@ -63,12 +63,12 @@ export const initStore = config => {
       [UPDATE_MUSIC_LIST](state) {
         const config = state.sourceConfig;
         const likedList = state.sourceConfig[constant.LIKED_LIST] || [];
-        state.musicList = fs.readdirSync(state.musicPath)
+        state.musicList = utils.readDirSync(state.musicPath)
           .filter(f => (
             config.allowKeys.indexOf(path.extname(f)) >= 0
           )).map(f => ({
             id: f,
-            url: `http://127.0.0.1:${config.port}/${f}`,
+            url: `http://127.0.0.1:${config.port}/${path.relative(state.musicPath, f).replace(/\\/g, '/')}`,
             name: path.basename(f, path.extname(f)),
             liked: likedList.indexOf(f) >= 0,
           }));
@@ -116,9 +116,13 @@ export const initStore = config => {
           watcher.close();
         }
 
-        watcherBind(watcher = chokidar.watch(filePath));
         commit(UPDATE_CONFIG, { key: constant.MUSIC_PATH, value: filePath });
         commit(UPDATE_MUSIC_LIST);
+
+        // watch and update file list
+        utils.watch(filePath, () => {
+          commit(UPDATE_MUSIC_LIST);
+        });
       },
 
       [SELECT_MUSIC_ACT]({ state, commit }, arg) {
@@ -142,17 +146,6 @@ export const initStore = config => {
       },
     },
   });
-
-  // watch music dir
-  function watcherBind() {
-    watcher.on('add', () => {
-      store.commit(UPDATE_MUSIC_LIST);
-    }).on('unlink', () => {
-      store.commit(UPDATE_MUSIC_LIST);
-    }).on('change', () => {
-      store.commit(UPDATE_MUSIC_LIST);
-    });
-  }
 
   return store;
 };

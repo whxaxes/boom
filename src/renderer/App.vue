@@ -98,9 +98,8 @@
     },
     mounted() {
       const musicPath = this.sourceConfig[constant.MUSIC_PATH];
-      const dirNotExist = musicPath && fs.existsSync(musicPath);
-      this.musicPath = musicPath || '';
-      if (!musicPath || !dirNotExist) {
+      this.musicPath = musicPath || remote.app.getPath('music');
+      if (!fs.existsSync(this.musicPath)) {
         this.showDialog = true;
       } else {
         this.$store.dispatch(UPDATE_PATH_ACT, this.musicPath);
@@ -191,6 +190,11 @@
   body {
     color: #333;
     font-family: "PingFangSC-Light", "Hiragino Sans GB", "Microsoft YaHei", sans-serif, "黑体";
+  }
+
+  input, textarea, button {
+    outline: none;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   }
 
   #app {
