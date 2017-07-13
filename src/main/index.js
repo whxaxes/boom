@@ -66,8 +66,11 @@ function startMusicServer(callback) {
       return notFound(res);
     }
 
-    const filename = path.basename(musicUrl);
-    const fileUrl = path.join(store.get(constant.MUSIC_PATH), filename);
+    const fileUrl = path.join(
+      store.get(constant.MUSIC_PATH),
+      musicUrl.substring(1)
+    );
+
     if (!fs.existsSync(fileUrl)) {
       return notFound(res);
     }
