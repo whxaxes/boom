@@ -1,7 +1,7 @@
 import Vue from 'vue';
-import App from './App';
+import App from './App.vue';
 import constant from 'constant';
-import { remote, ipcRenderer } from 'electron';
+import { ipcRenderer } from 'electron';
 import { initStore } from './store';
 
 if (!process.env.IS_WEB) {

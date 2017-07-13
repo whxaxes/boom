@@ -10,7 +10,6 @@ import utils from '~utils';
 const AC = new window.AudioContext();
 const readFile = promisify(fs.readFile);
 const isFullScreen = remote.getCurrentWindow().isFullScreen();
-let watcher;
 
 Vue.use(Vuex);
 
