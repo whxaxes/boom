@@ -121,7 +121,7 @@
     top: 0;
     bottom: 0;
     margin: auto;
-    background-color: rgba(0, 0, 0, .8);
+    background-color: rgba(0, 0, 0, .9);
     z-index: 3;
   }
   
