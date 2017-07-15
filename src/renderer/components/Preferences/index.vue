@@ -1,5 +1,5 @@
 <template>
-  <div class="Preperences">
+  <div class="Preferences">
     <div class="pre-menu">
       <div class="menu-item"
            :class="{ active: menu === item }"

@@ -8,7 +8,7 @@ import {
 } from '~/store';
 
 export default {
-  name: 'Preperences',
+  name: 'Preferences',
   data() {
     return {
       styles: Object.keys(styles),
