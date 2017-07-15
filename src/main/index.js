@@ -30,8 +30,8 @@ const allowKeys = Object.keys(allowFiles);
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 1000,
-    height: 600,
+    width: constant.WIN_WIDTH,
+    height: constant.WIN_HEIGHT,
     useContentSize: true,
     titleBarStyle: 'hidden-inset',
     frame: false,

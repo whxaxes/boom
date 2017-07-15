@@ -1,4 +1,6 @@
 export default {
+  WIN_WIDTH: 1000,
+  WIN_HEIGHT: 600,
   VIEW_READY: 'viewReady',
   INIT_CONFIG: 'initConfig',
   SAVE_CONFIG: 'saveConfig',

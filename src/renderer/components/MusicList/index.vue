@@ -84,7 +84,7 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-  
+
     .icon-heart {
       margin-right: 5px;
       opacity: .5;
