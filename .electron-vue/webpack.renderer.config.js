@@ -17,7 +17,12 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/webpack-configurations.html#white-listing-externals
  */
 const whiteListedModules = ['vue'];
-
+const sassLoader = {
+  loader: 'sass-loader',
+  options: {
+    includePaths: [path.resolve(__dirname, '../src/renderer/assets')],
+  }
+};
 const rendererConfig = {
   devtool: '#cheap-module-eval-source-map',
   entry: {
@@ -27,8 +32,7 @@ const rendererConfig = {
     ...Object.keys(dependencies || {}).filter(d => !whiteListedModules.includes(d)),
   ],
   module: {
-    rules: [
-      {
+    rules: [{
         test: /\.(js|vue)$/,
         enforce: 'pre',
         exclude: /node_modules/,
@@ -50,7 +54,10 @@ const rendererConfig = {
         test: /\.scss$/,
         use: ExtractTextPlugin.extract({
           fallback: 'style-loader',
-          use: ['css-loader', 'sass-loader']
+          use: [
+            'css-loader',
+            sassLoader,
+          ]
         }),
       },
       {
@@ -73,8 +80,11 @@ const rendererConfig = {
           options: {
             extractCSS: process.env.NODE_ENV === 'production',
             loaders: {
-              sass: 'vue-style-loader!css-loader!sass-loader?indentedSyntax=1',
-              scss: 'vue-style-loader!css-loader!sass-loader',
+              scss: [
+                'vue-style-loader',
+                'css-loader',
+                sassLoader,
+              ],
             },
           },
         },
@@ -115,9 +125,8 @@ const rendererConfig = {
         removeAttributeQuotes: true,
         removeComments: true,
       },
-      nodeModules: process.env.NODE_ENV !== 'production'
-        ? path.resolve(__dirname, '../node_modules')
-        : false,
+      nodeModules: process.env.NODE_ENV !== 'production' ?
+        path.resolve(__dirname, '../node_modules') : false,
     }),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
@@ -161,13 +170,11 @@ if (process.env.NODE_ENV === 'production') {
       removeConsole: true,
       removeDebugger: true,
     }),
-    new CopyWebpackPlugin([
-      {
-        from: path.join(__dirname, '../static'),
-        to: path.join(__dirname, '../dist/electron/static'),
-        ignore: ['.*'],
-      },
-    ]),
+    new CopyWebpackPlugin([{
+      from: path.join(__dirname, '../static'),
+      to: path.join(__dirname, '../dist/electron/static'),
+      ignore: ['.*'],
+    }, ]),
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': '"production"',
     }),

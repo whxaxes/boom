@@ -1,0 +1,93 @@
+@import 'variable';
+$textColor: #aaa;
+.Preperences {
+  box-sizing: border-box;
+  padding: 40px 20px;
+  color: $textColor;
+  .pre-menu {
+    position: absolute;
+    width: $menuWidth;
+    .menu-item {
+      width: 100%;
+      font-size: 20px;
+      height: 50px;
+      line-height: 50px;
+      cursor: pointer;
+    }
+    .active {
+      font-weight: bold;
+      color: #ffdd00;
+    }
+  }
+  .pre-controll {
+    position: absolute;
+    left: 20px;
+    right: 20px;
+    bottom: 0;
+    margin: auto;
+    text-align: right;
+    .btn {
+      display: inline-block;
+      width: 80px;
+      height: 36px;
+      line-height: 36px;
+      text-align: center;
+      background-color: #333;
+      border-radius: 4px;
+      margin: 20px 5px;
+      cursor: pointer;
+      transition: background-color .3s, color .3s;
+      &:hover {
+        color: #000;
+        background-color: #ffdd00;
+      }
+    }
+  }
+  .pre-content {
+    margin: 0 0 0 $menuWidth;
+  }
+  .pre-title {
+    font-size: 30px;
+    font-weight: bold;
+    margin-bottom: 30px;
+    color: #ccc;
+  }
+  .pre-item {
+    padding: 0 5px;
+    margin-bottom: 20px;
+    .item-title {
+      font-size: 18px;
+      line-height: 24px;
+      font-weight: bold;
+    }
+    .sub-title {
+      font-size: 14px;
+      line-height: 20px;
+      color: #666;
+    }
+    input,
+    select {
+      width: 100%;
+      max-width: 530px;
+      height: 36px;
+      line-height: 36px;
+      margin: 10px 0;
+      font-size: 18px;
+      color: $textColor;
+      background-color: #333;
+      border: none;
+      border-radius: 4px;
+      box-sizing: border-box;
+      padding: 0 10px;
+      border: 1px solid transparent;
+    }
+    input:focus {
+      border-color: #ffdd00;
+    }
+    a {
+      cursor: pointer;
+      color: #ffdd00;
+      text-decoration: underline;
+    }
+  }
+}

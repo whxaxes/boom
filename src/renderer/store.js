@@ -6,6 +6,8 @@ import promisify from 'es6-promisify';
 import { ipcRenderer, remote } from 'electron';
 import constant from 'constant';
 import utils from '~utils';
+import defaultConfig from '~/lib/default';
+import styles from '~/lib/styles';
 
 const AC = new window.AudioContext();
 const readFile = promisify(fs.readFile);
@@ -22,11 +24,13 @@ export const UPDATE_CONFIG = 'updateConfig';
 export const UPDATE_SIMPLE_MODE = 'updateSimpleMode';
 export const UPDATE_FULL_SCREEN = 'updateFullScreen';
 export const UPDATE_MUSIC_LIST = 'updateMusicList';
+export const UPDATE_PLAY_STYLE = 'updatePlayStyle';
 
 // actions
 export const UPDATE_PATH_ACT = 'updatePathAction';
 export const LIKE_MUSIC_ACT = 'likeMusicAction';
 export const SELECT_MUSIC_ACT = 'selectMusicAction';
+export const UPDATE_PLAY_STYLE_ACT = 'updatePlayStyleAction';
 
 // init store
 export const initStore = config => {
@@ -34,8 +38,10 @@ export const initStore = config => {
   const store = new Vuex.Store({
     state: {
       currentId: config[constant.CURRENT_ID],
+      version: remote.app.getVersion(),
       musicList: [],
-      playStyle: 'column',
+      musicPath: '',
+      playStyle: '',
       sourceConfig: config,
       simpleMode: isFullScreen,
       isFullScreen,
@@ -81,6 +87,10 @@ export const initStore = config => {
 
       [UPDATE_SIMPLE_MODE](state, mode) {
         state.simpleMode = mode;
+      },
+
+      [UPDATE_PLAY_STYLE](state, style) {
+        state.playStyle = style;
       },
 
       [UPDATE_FULL_SCREEN](state, isFullScreen) {
@@ -139,6 +149,14 @@ export const initStore = config => {
         });
       },
 
+      [UPDATE_PLAY_STYLE_ACT]({ state, commit }, arg) {
+        commit(UPDATE_PLAY_STYLE, arg);
+        commit(UPDATE_CONFIG, {
+          key: constant.PLAY_STYLE,
+          value: state.playStyle,
+        });
+      },
+
       [LIKE_MUSIC_ACT]({ state, commit }, arg) {
         commit(LIKE_MUSIC, arg);
 
@@ -153,5 +171,7 @@ export const initStore = config => {
     },
   });
 
+  store.dispatch(UPDATE_PATH_ACT, config[constant.MUSIC_PATH] || defaultConfig.musicPath);
+  store.dispatch(UPDATE_PLAY_STYLE_ACT, config[constant.PLAY_STYLE] || defaultConfig.playStyle);
   return store;
 };
