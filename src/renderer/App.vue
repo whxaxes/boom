@@ -5,9 +5,9 @@
     <div class="fake-left-side"></div>
     <music-list class="left-side"></music-list>
     <music-player class="right-side"></music-player>
-    <prefernces v-if="showPreference"
-                @close="showPreference = false"
-                class="config-side"></prefernces>
+    <preferences v-if="showPreference"
+                 @close="showPreference = false"
+                 class="config-side"></preferences>
   </div>
 </template>
 
@@ -22,7 +22,7 @@
   import constant from 'constant';
   import MusicList from '~/components/MusicList';
   import MusicPlayer from '~/components/MusicPlayer';
-  import Prefernces from '~/components/Preperences';
+  import Preferences from '~/components/Preferences';
   const win = remote.getCurrentWindow();
 
   export default {
@@ -37,7 +37,7 @@
     components: {
       MusicList,
       MusicPlayer,
-      Prefernces,
+      Preferences,
     },
     computed: {
       ...mapState([
@@ -121,7 +121,7 @@
     top: 0;
     bottom: 0;
     margin: auto;
-    background-color: rgba(0, 0, 0, .8);
+    background-color: rgba(0, 0, 0, .9);
     z-index: 3;
   }
   

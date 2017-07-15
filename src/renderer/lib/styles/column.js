@@ -1,8 +1,13 @@
 const COL_COUNT = 30;
-const COL_DIS = 40;
+const MARGIN = 40;
 const RED_BOX_H = 5;
-const SPLIT_DIS = 3;
-const FULL_H = RED_BOX_H + SPLIT_DIS;
+const SPLIT_DIS = 2;
+const COL_DIS = 3;
+
+let col_dis;
+let red_box_h;
+let split_dis;
+let full_h;
 let grd;
 
 class Column {
@@ -20,11 +25,11 @@ class Column {
     this.power = this.h * power / 256;
 
     // update position
-    const nh = this.dy + RED_BOX_H;
+    const nh = this.dy + red_box_h;
     if (this.power >= this.y - nh) {
-      this.dy = this.y - this.power - RED_BOX_H - (this.power === 0 ? 0 : 1);
+      this.dy = this.y - this.power - red_box_h - (this.power === 0 ? 0 : 1);
     } else if (nh > this.y) {
-      this.dy = this.y - RED_BOX_H;
+      this.dy = this.y - red_box_h;
     } else {
       this.dy += 1;
     }
@@ -33,13 +38,13 @@ class Column {
   draw() {
     const ctx = this.ctx;
     ctx.fillStyle = grd;
-    const h = (~~(this.power / FULL_H)) * FULL_H;
+    const h = (~~(this.power / full_h)) * full_h;
     ctx.fillRect(this.x, this.y - h, this.w, h);
   }
 
   drawLater() {
     this.ctx.fillStyle = '#950000';
-    this.ctx.fillRect(this.x, ~~this.dy, this.w, RED_BOX_H);
+    this.ctx.fillRect(this.x, ~~this.dy, this.w, red_box_h);
   }
 }
 
@@ -53,14 +58,21 @@ export default {
     this.ctx = canvas.getContext('2d');
     this._ctx = this._canvas.getContext('2d');
 
+    const w_ratio = canvas.width / 1000;
+    const h_ratio = canvas.height / 600;
+    col_dis = Math.round(COL_DIS * w_ratio);
+    red_box_h = Math.round(RED_BOX_H * h_ratio);
+    split_dis = Math.round(SPLIT_DIS * h_ratio);
+    full_h = red_box_h + split_dis;
+
     // calculate width
-    const aw = (canvas.width - 2 * COL_DIS) / COL_COUNT;
-    const w = aw - 5;
+    const aw = (canvas.width - 2 * MARGIN) / COL_COUNT;
+    const w = aw - col_dis;
 
     // calculate height
     const imgHeight = canvas.height / 2;
-    this.num = ~~((imgHeight - 100) / FULL_H);
-    const columnHeight = this.num * FULL_H;
+    this.num = ~~((imgHeight - 100) / full_h);
+    const columnHeight = this.num * full_h;
     this.start = imgHeight - columnHeight;
 
     // gradient color
@@ -77,7 +89,7 @@ export default {
       this.columnList.push(new Column(
         this._ctx,
         w, columnHeight,
-        COL_DIS + i * aw,
+        MARGIN + i * aw,
         imgHeight
       ));
     }
@@ -102,8 +114,8 @@ export default {
     // split column
     for (let i = 0; i < this.num; i++) {
       this._ctx.clearRect(
-        0, this.start + i * FULL_H - 0.1,
-        this.canvas.width, SPLIT_DIS + 0.1
+        0, this.start + i * full_h - 0.1,
+        this.canvas.width, split_dis + 0.1
       );
     }
 
