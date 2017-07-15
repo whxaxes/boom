@@ -5,5 +5,6 @@ export default {
   CURRENT_ID: 'currentId',
   MUSIC_PATH: 'musicPath',
   LIKED_LIST: 'likedList',
+  PLAY_STYLE: 'playStyle',
   PREFERENCES: 'preferences',
 };

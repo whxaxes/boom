@@ -4,6 +4,7 @@
          ref="musicScroller"
          @wheel.passive="clearScrollAnimate">
       <div class="music-item"
+           :title="item.name"
            ref="musicItem"
            v-for="item in musicList"
            :key="item.id"

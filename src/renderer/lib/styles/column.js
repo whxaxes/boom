@@ -83,6 +83,10 @@ export default {
     }
   },
 
+  destroyed() {
+    this.columnList.length = 0;
+  },
+
   update(array) {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this._ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);

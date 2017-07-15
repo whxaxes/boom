@@ -5,7 +5,7 @@ import {
   UPDATE_SIMPLE_MODE,
   UPDATE_CONFIG,
 } from '~/store';
-import styles from './styles';
+import styles from '~/lib/styles';
 import stage from '~/lib/stage';
 const win = remote.getCurrentWindow();
 const AC = new window.AudioContext();
@@ -57,6 +57,13 @@ export default {
   watch: {
     currentId() {
       this.changeMusic(true);
+    },
+
+    playStyle(newValue, oldValue) {
+      if (styles[oldValue].destroyed) {
+        styles[oldValue].destroyed();
+      }
+      this.initCanvas();
     },
   },
   methods: {

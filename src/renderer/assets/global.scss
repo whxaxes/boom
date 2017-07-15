@@ -1,0 +1,73 @@
+@font-face {
+  font-family: "iconfont";
+  src: url('./assets/iconfont.woff') format('woff'), url('./assets/iconfont.ttf') format('truetype');
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-simple:before {
+  content: "\e600";
+}
+
+.icon-notificationfill:before {
+  content: "\e66a";
+}
+
+.icon-notificationforbidfill:before {
+  content: "\e6db";
+}
+
+.icon-backwardfill:before {
+  content: "\e74d";
+}
+
+.icon-playfill:before {
+  content: "\e74f";
+}
+
+.icon-stop:before {
+  content: "\e750";
+}
+
+.icon-play_forward_fill:before {
+  content: "\e7f5";
+}
+
+.icon-repeat:before {
+  content: "\e6d7";
+}
+
+.icon-heart:before {
+  content: "\e605";
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  color: #333;
+  font-family: "PingFangSC-Light", "Hiragino Sans GB", "Microsoft YaHei", sans-serif, "黑体";
+}
+
+input,
+textarea,
+button,
+select {
+  outline: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}

@@ -1,0 +1,111 @@
+.dialog-enter-active,
+.dialog-leave-active {
+  transition: opacity .3s;
+}
+
+.dialog-enter-active {
+  .dialog-content {
+    animation: showDialogAnimation .3s forwards;
+  }
+}
+
+.dialog-leave-active {
+  .dialog-content {
+    animation: hideDialogAnimation .3s forwards;
+  }
+}
+
+.dialog-enter,
+.dialog-leave-to {
+  opacity: 0;
+}
+
+.Dialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  z-index: 100;
+  will-change: transform;
+  .dialog-mask {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: #000;
+    opacity: .7;
+  }
+  .dialog-title {
+    position: relative;
+    width: 100%;
+    height: 30px;
+    line-height: 30px;
+    .dialog-title-content {
+      position: absolute;
+      display: block;
+      font-size: 16px;
+      font-weight: bold;
+      height: 100%;
+      left: -20px;
+      right: -20px;
+      top: -20px;
+      margin: auto;
+      box-sizing: border-box;
+      padding: 0 10px;
+      background-color: #444;
+    }
+    .close-btn {
+      position: absolute;
+      display: block;
+      width: 20px;
+      height: 20px;
+      line-height: 20px;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      margin: auto;
+      cursor: pointer;
+    }
+  }
+  .dialog-content {
+    position: absolute;
+    top: 0;
+    bottom: 100px;
+    left: 0;
+    right: 0;
+    margin: auto;
+    color: #ccc;
+    box-sizing: border-box;
+    padding: 20px;
+    background-color: #333;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+}
+
+@keyframes showDialogAnimation {
+  0% {
+    transform: scale(.6);
+  }
+  75% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes hideDialogAnimation {
+  0% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(.6);
+  }
+}
