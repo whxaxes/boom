@@ -14,6 +14,7 @@ class Column {
   constructor(ctx, w, h, x, y) {
     this.w = w;
     this.h = h;
+    this.rh = 0;
     this.x = x;
     this.y = y;
     this.power = 0;
@@ -23,6 +24,7 @@ class Column {
 
   update(power) {
     this.power = this.h * power / 256;
+    this.rh = (~~(this.power / full_h)) * full_h;
 
     // update position
     const nh = this.dy + red_box_h;
@@ -38,8 +40,7 @@ class Column {
   draw() {
     const ctx = this.ctx;
     ctx.fillStyle = grd;
-    const h = (~~(this.power / full_h)) * full_h;
-    ctx.fillRect(this.x, this.y - h, this.w, h);
+    ctx.fillRect(this.x, this.y - this.rh, this.w, this.rh);
   }
 
   drawLater() {
@@ -49,7 +50,7 @@ class Column {
 }
 
 export default {
-  init(canvas) {
+  init(canvas, w_ratio, h_ratio) {
     this.columnList = [];
     this._canvas = document.createElement('canvas');
     this._canvas.width = canvas.width;
@@ -57,9 +58,8 @@ export default {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
     this._ctx = this._canvas.getContext('2d');
+    this.per = Math.ceil(950 / COL_COUNT);
 
-    const w_ratio = canvas.width / 1000;
-    const h_ratio = canvas.height / 600;
     col_dis = Math.round(COL_DIS * w_ratio);
     red_box_h = Math.round(RED_BOX_H * h_ratio);
     split_dis = Math.round(SPLIT_DIS * h_ratio);
@@ -102,10 +102,9 @@ export default {
   update(array) {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this._ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    const len = ~~(array.length / this.columnList.length) - 2;
 
     // draw column
-    for (let i = 0, j = 0; i < this.columnList.length; i++, j += len) {
+    for (let i = 0, j = 0; i < this.columnList.length; i++, j += this.per) {
       const rt = this.columnList[i];
       rt.update(array[j]);
       rt.draw();

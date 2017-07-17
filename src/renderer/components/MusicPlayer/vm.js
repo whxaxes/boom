@@ -226,7 +226,11 @@ export default {
       const canvas = this.$refs.canvas;
       canvas.width = canvas.offsetWidth;
       canvas.height = canvas.offsetHeight;
-      styles[this.playStyle].init(canvas);
+      styles[this.playStyle].init(
+        canvas,
+        window.innerWidth / 1000,
+        window.innerHeight / 600,
+      );
     },
 
     onResize() {
