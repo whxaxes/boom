@@ -228,8 +228,8 @@ export default {
       canvas.height = canvas.offsetHeight;
       styles[this.playStyle].init(
         canvas,
-        window.innerWidth / 1000,
-        window.innerHeight / 600,
+        canvas.width / 800,
+        canvas.height / 600,
       );
     },
 

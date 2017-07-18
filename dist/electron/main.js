@@ -1197,8 +1197,14 @@ if (process.env.NODE_ENV !== 'development') {
 var mainWindow = void 0;
 var winURL = process.env.NODE_ENV === 'development' ? 'http://localhost:9080' : 'file://' + __dirname + '/index.html';
 
-var allowFiles = { '.mp3': 'audio/mpeg', '.wav': 'audio/wav' };
-var allowKeys = __WEBPACK_IMPORTED_MODULE_1_babel_runtime_core_js_object_keys___default()(allowFiles);
+ms.mediaTypes['.flac'] = 'audio/flac';
+var allowKeys = [];
+
+__WEBPACK_IMPORTED_MODULE_1_babel_runtime_core_js_object_keys___default()(ms.mediaTypes).forEach(function (ext) {
+  if (ms.mediaTypes[ext].indexOf('audio') === 0) {
+    allowKeys.push(ext);
+  }
+});
 
 function createWindow() {
   mainWindow = new __WEBPACK_IMPORTED_MODULE_2_electron__["BrowserWindow"]({

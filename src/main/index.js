@@ -25,8 +25,14 @@ const winURL = process.env.NODE_ENV === 'development' ?
   'http://localhost:9080' :
   `file://${__dirname}/index.html`;
 
-const allowFiles = { '.mp3': 'audio/mpeg', '.wav': 'audio/wav' };
-const allowKeys = Object.keys(allowFiles);
+ms.mediaTypes['.flac'] = 'audio/flac';
+const allowKeys = [];
+// collect audio's extname
+Object.keys(ms.mediaTypes).forEach(ext => {
+  if (ms.mediaTypes[ext].indexOf('audio') === 0) {
+    allowKeys.push(ext);
+  }
+});
 
 function createWindow() {
   mainWindow = new BrowserWindow({
