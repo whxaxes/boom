@@ -1,5 +1,7 @@
 const DIS = 20;
 const COLOR_START = 150;
+const MAX_WIDTH = 5;
+let max_width;
 
 export default {
   init(canvas, w_ratio) {
@@ -15,6 +17,7 @@ export default {
     this.colors = [ COLOR_START, COLOR_START, COLOR_START ];
     this.colorIndex = 0;
     this.direction = true;
+    max_width = MAX_WIDTH * w_ratio;
 
     for (let i = 1; i < this.maxLen; i++) {
       const o = i % 2 === 0;
@@ -48,7 +51,7 @@ export default {
       this.colorIndex = (this.colorIndex + 1) % this.colors.length;
       this.direction = !this.direction;
     }
-    this.ctx.lineWidth = 2 + 5 * ratioAverage;
+    this.ctx.lineWidth = 2 + max_width * ratioAverage;
     this.ctx.shadowColor = this.ctx.strokeStyle = `rgb(${this.colors.join(',')})`;
     ctx.stroke();
   },

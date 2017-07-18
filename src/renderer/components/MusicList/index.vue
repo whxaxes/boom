@@ -86,9 +86,11 @@
     text-overflow: ellipsis;
 
     .icon-heart {
-      margin-right: 5px;
+      display: inline-block;
       opacity: .5;
       font-size: 14px;
+      width: 34px;
+      height: 100%;
       color: rgba(255, 255, 255, .4);
   
       &.active {
