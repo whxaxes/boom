@@ -203,7 +203,7 @@ export default {
         const lessTime = this.audioStatus.duration - this.audioStatus.currentTime;
         // end event would not be fired while currentTime changed
         // so use timeout to fire end event.
-        if (this.audioStatus.duration && lessTime < 2) {
+        if (this.audioStatus.duration && lessTime < 5) {
           endTimeout = setTimeout(() => { onEnd(); }, lessTime * 1000 + 100);
         }
       };
