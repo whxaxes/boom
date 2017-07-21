@@ -37,6 +37,7 @@ canvas {
   align-items: center;
   opacity: .6;
   transition: opacity .3s;
+
   .music-name {
     position: absolute;
     width: 100%;
@@ -49,6 +50,7 @@ canvas {
     white-space: nowrap;
     text-overflow: ellipsis;
   }
+
   .progress {
     position: relative;
     width: 200px;
@@ -56,6 +58,7 @@ canvas {
     float: left;
     margin: 0 10px;
     cursor: pointer;
+
     &:before,
     .progress-bar {
       pointer-events: none;
@@ -69,18 +72,21 @@ canvas {
       margin: auto;
       background-color: #000;
     }
+
     .progress-bar {
       width: 0;
       right: auto;
       background-color: #333;
     }
   }
+
   .iconfont {
     display: flex;
     font-size: 20px;
     color: #ccc;
     transition: color .3s;
   }
+
   .btn {
     width: 40px;
     height: 40px;
@@ -94,6 +100,7 @@ canvas {
       color: #fff;
     }
   }
+
   .play-button {
     border: 1px solid #000;
     border-radius: 100%;
@@ -106,6 +113,7 @@ canvas {
       left: 2px;
     }
   }
+
   .loop-button {
     position: relative;
     .single-symbol {
@@ -116,7 +124,9 @@ canvas {
       font-size: 8px;
     }
   }
-  .simple-button {
+
+  .simple-button,
+  .like-button {
     .iconfont {
       opacity: .3;
     }

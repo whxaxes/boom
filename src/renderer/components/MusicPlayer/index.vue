@@ -3,21 +3,18 @@
     <canvas ref="canvas"></canvas>
     <audio ref="audio"
            preload
-           :src="url"
+           :src="music.url"
            crossorigin="anonymous"></audio>
     <div class="controll">
       <div class="audio-state">
-        <div class="music-name">{{ name }}</div>
+        <div class="music-name">{{ music.name }}</div>
         <div class="btn">
           <i class="iconfont icon-backwardfill"
              @click="prev"></i>
         </div>
         <div class="btn play-button">
           <i class="iconfont"
-             :class="{
-              'icon-playfill': !audioStatus.playing,
-              'icon-stop': audioStatus.playing 
-              }"
+             :class="{ 'icon-playfill': !audioStatus.playing, 'icon-stop': audioStatus.playing }"
              @click="play"></i>
         </div>
         <div class="btn">
@@ -32,10 +29,7 @@
         <div class="btn mute-button">
           <i class="iconfont"
              @click="mute"
-             :class="{
-              'icon-notificationforbidfill': audioStatus.muted,
-              'icon-notificationfill': !audioStatus.muted,
-              }"></i>
+             :class="{'icon-notificationforbidfill': audioStatus.muted, 'icon-notificationfill': !audioStatus.muted, }"></i>
         </div>
         <div class="btn loop-button">
           <i class="iconfont icon-repeat"
@@ -46,10 +40,16 @@
           <i class="iconfont icon-heart"
              v-if="audioStatus.loop === loopTypes.like"></i>
         </div>
-        <div class="btn simple-button">
+        <div class="btn simple-button"
+             v-if="false">
           <i class="iconfont icon-simple"
              @click="simple"
              :class="{ active: simpleMode }"></i>
+        </div>
+        <div class="btn like-button">
+          <i class="iconfont icon-heart"
+             @click="like"
+             :class="{ active: music.liked }"></i>
         </div>
       </div>
     </div>

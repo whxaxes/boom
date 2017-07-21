@@ -1,6 +1,7 @@
 import { SELECT_MUSIC_ACT, LIKE_MUSIC_ACT } from '~/store';
-import { mapState } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import stage from '~/lib/stage';
+import { remote } from 'electron';
 
 export default {
   name: 'music-list',
@@ -10,10 +11,8 @@ export default {
     };
   },
   computed: {
-    ...mapState([
-      'currentId',
-      'musicList',
-    ]),
+    ...mapState([ 'currentId', 'musicList' ]),
+    ...mapGetters([ 'music' ]),
   },
   watch: {
     currentId() {
@@ -22,7 +21,9 @@ export default {
   },
   methods: {
     updatePosition(isMiddle, rightNow) {
-      const index = this.musicList.findIndex(item => item.id === this.currentId);
+      const index = this.musicList.findIndex(
+        item => item.id === this.currentId
+      );
       if (index < 0) {
         return;
       }
@@ -30,7 +31,7 @@ export default {
       const rect = this.$refs.musicItem[index].getBoundingClientRect();
       const scroller = this.$refs.musicScroller;
       const srect = scroller.getBoundingClientRect();
-      const sheight = scroller.clientHeight - 30;
+      const sheight = scroller.clientHeight - srect.top;
       const topDis = rect.top - srect.top;
       let scrollTo = null;
 

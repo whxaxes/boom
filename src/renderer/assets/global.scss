@@ -1,6 +1,7 @@
 @font-face {
   font-family: "iconfont";
-  src: url('./assets/iconfont.woff') format('woff'), url('./assets/iconfont.ttf') format('truetype');
+  src: url('./assets/iconfont.woff') format('woff'),
+    url('./assets/iconfont.ttf') format('truetype');
 }
 
 .iconfont {
@@ -47,6 +48,19 @@
   content: "\e605";
 }
 
+.icon-directory:before {
+  content: "\e857";
+}
+
+.icon-sort:before {
+  content: "\ed26";
+}
+
+.icon-plus:before {
+  font-weight: bold;
+  content: '+';
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -61,7 +75,8 @@ body {
 
 body {
   color: #333;
-  font-family: "PingFangSC-Light", "Hiragino Sans GB", "Microsoft YaHei", sans-serif, "黑体";
+  font-family: "PingFangSC-Light", "Hiragino Sans GB", "Microsoft YaHei",
+    sans-serif, "黑体";
 }
 
 input,

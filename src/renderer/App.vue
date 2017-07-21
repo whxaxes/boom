@@ -1,6 +1,8 @@
 <template>
   <div id="app"
        :class="{ 'fullscreen': isFullScreen, 'simple-mode': simpleMode }">
+    <div class="poster"
+         :style="{ backgroundImage: `url(${music.posterUrl})` }"></div>
     <div class="title-bar"></div>
     <div class="fake-left-side"></div>
     <music-list class="left-side"></music-list>
@@ -14,7 +16,7 @@
 <script>
   import fs from 'fs';
   import { ipcRenderer, remote } from 'electron';
-  import { mapState } from 'vuex';
+  import { mapState, mapGetters } from 'vuex';
   import {
     UPDATE_PATH_ACT,
     UPDATE_FULL_SCREEN,
@@ -44,6 +46,9 @@
         'sourceConfig',
         'simpleMode',
         'isFullScreen',
+      ]),
+      ...mapGetters([
+        'music',
       ]),
     },
     methods: {
@@ -93,6 +98,15 @@
     left: 0;
     right: 0;
     margin: auto;
+  
+    .poster {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: no-repeat center center;
+      background-size: cover;
+      opacity: .08;
+    }
   }
   
   .left-side,

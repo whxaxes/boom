@@ -132,9 +132,8 @@ export default {
     this.ctx.translate(this.canvas.width / 2, this.canvas.height / 2);
     this.ctx.rotate(Math.PI);
     this.ctx.scale(-1, 1);
+    this.ctx.globalAlpha = 0.2;
     this.ctx.drawImage(this._canvas, -this.canvas.width / 2, -this.canvas.height / 2);
     this.ctx.restore();
-    this.ctx.fillStyle = 'rgba(0, 0, 0, .8)';
-    this.ctx.fillRect(0, this.canvas.height / 2, this.canvas.width, this.canvas.height / 2);
   },
 };

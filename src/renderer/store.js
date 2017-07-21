@@ -12,6 +12,7 @@ import styles from '~/lib/styles';
 const AC = new window.AudioContext();
 const readFile = promisify(fs.readFile);
 const isFullScreen = remote.getCurrentWindow().isFullScreen();
+const posterCache = {};
 
 Vue.use(Vuex);
 
@@ -25,12 +26,14 @@ export const UPDATE_SIMPLE_MODE = 'updateSimpleMode';
 export const UPDATE_FULL_SCREEN = 'updateFullScreen';
 export const UPDATE_MUSIC_LIST = 'updateMusicList';
 export const UPDATE_PLAY_STYLE = 'updatePlayStyle';
+export const UPDATE_POSTER_URL = 'updatePosterUrl';
 
 // actions
 export const UPDATE_PATH_ACT = 'updatePathAction';
 export const LIKE_MUSIC_ACT = 'likeMusicAction';
 export const SELECT_MUSIC_ACT = 'selectMusicAction';
 export const UPDATE_PLAY_STYLE_ACT = 'updatePlayStyleAction';
+export const UPDATE_POSTER_URL_ACT = 'updatePosterUrlAction';
 
 // init store
 export const initStore = config => {
@@ -46,6 +49,17 @@ export const initStore = config => {
       simpleMode: isFullScreen,
       isFullScreen,
     },
+    getters: {
+      music(state) {
+        const id = state.currentId;
+        return state.musicList.find(item => item.id === id) || {};
+      },
+
+      musicIndex(state) {
+        const id = state.currentId;
+        return state.musicList.findIndex(item => item.id === id);
+      },
+    },
     mutations: {
       [SELECT_MUSIC](state, id) {
         state.currentId = id;
@@ -58,6 +72,10 @@ export const initStore = config => {
         }
       },
 
+      [UPDATE_POSTER_URL](state, { music, url }) {
+        music.posterUrl = url;
+      },
+
       [UPDATE_PATH](state, newPath) {
         if (!fs.existsSync(newPath)) {
           return;
@@ -68,15 +86,19 @@ export const initStore = config => {
 
       [UPDATE_MUSIC_LIST](state) {
         const config = state.sourceConfig;
-        const likedList = state.sourceConfig[constant.LIKED_LIST] || [];
-        state.musicList = utils.readDirSync(state.musicPath)
-          .filter(f => (
-            config.allowKeys.indexOf(path.extname(f)) >= 0
-          )).map(f => ({
+        const likedList = config[constant.LIKED_LIST] || [];
+        state.musicList = utils
+          .readDirSync(state.musicPath)
+          .filter(f => config.allowKeys.indexOf(path.extname(f)) >= 0)
+          .map(f => ({
             id: f,
-            url: `http://127.0.0.1:${config.port}/${path.relative(state.musicPath, f).replace(/\\/g, '/')}`,
+            url: `http://127.0.0.1:${config.port}/${path
+              .relative(state.musicPath, f)
+              .replace(/\\/g, '/')}`,
+            realPath: f,
             name: path.basename(f, path.extname(f)),
             liked: likedList.indexOf(f) >= 0,
+            posterUrl: posterCache[f],
           }));
       },
 
@@ -141,11 +163,27 @@ export const initStore = config => {
         });
       },
 
-      [SELECT_MUSIC_ACT]({ state, commit }, arg) {
+      [SELECT_MUSIC_ACT]({ state, commit, dispatch }, arg) {
         commit(SELECT_MUSIC, arg);
         commit(UPDATE_CONFIG, {
           key: constant.CURRENT_ID,
           value: state.currentId,
+        });
+        dispatch(UPDATE_POSTER_URL_ACT);
+      },
+
+      [UPDATE_POSTER_URL_ACT]({ commit, getters }) {
+        const music = getters.music;
+        if (music.posterUrl !== undefined && music.posterUrl !== null) {
+          return;
+        }
+
+        utils.getPicture(music.realPath, (e, url) => {
+          posterCache[music.id] = url;
+          commit(UPDATE_POSTER_URL, {
+            music,
+            url,
+          });
         });
       },
 
@@ -171,7 +209,14 @@ export const initStore = config => {
     },
   });
 
-  store.dispatch(UPDATE_PATH_ACT, config[constant.MUSIC_PATH] || defaultConfig.musicPath);
-  store.dispatch(UPDATE_PLAY_STYLE_ACT, config[constant.PLAY_STYLE] || defaultConfig.playStyle);
+  store.dispatch(
+    UPDATE_PATH_ACT,
+    config[constant.MUSIC_PATH] || defaultConfig.musicPath
+  );
+  store.dispatch(
+    UPDATE_PLAY_STYLE_ACT,
+    config[constant.PLAY_STYLE] || defaultConfig.playStyle
+  );
+  store.dispatch(UPDATE_POSTER_URL_ACT);
   return store;
 };

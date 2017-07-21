@@ -1,5 +1,9 @@
 <template>
   <div class="music-list">
+    <div class="music-control">
+      <!-- <i class="iconfont icon-directory"></i> -->
+      <!-- <i class="iconfont icon-plus"></i> -->
+    </div>
     <div class="music-scroller"
          ref="musicScroller"
          @wheel.passive="clearScrollAnimate">
@@ -27,9 +31,42 @@
 </script>
 
 <style lang="scss" rel="stylesheet/scss">
+  $topSize: 50px;
   .music-list {
     height: 100%;
     overflow: hidden;
+  }
+
+  .music-control {
+    position: absolute;
+    width: 100%;
+    height: $topSize;
+    color: #fff;
+    text-align: right;
+    box-sizing: border-box;
+    padding: 30px 5px 0 30px;
+  
+    .iconfont {
+      float: right;
+      width: 30px;
+      height: 30px;
+      line-height: 30px;
+      text-align: center;
+      cursor: pointer;
+    }
+  
+    .icon-plus {
+      font-size: 20px;
+    }
+  
+    .icon-directory {
+      font-size: 14px;
+      opacity: .3;
+    }
+  
+    .active {
+      opacity: 1;
+    }
   }
   
   .fullscreen {
@@ -46,8 +83,8 @@
     overflow-y: auto;
     overflow-x: hidden;
     transition: transform .3s;
-    transform: translateY(30px);
-    border-bottom: 30px solid transparent;
+    transform: translateY($topSize);
+    border-bottom: $topSize solid transparent;
   }
   
   .music-item {
@@ -84,7 +121,7 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-
+  
     .icon-heart {
       display: inline-block;
       opacity: .5;
