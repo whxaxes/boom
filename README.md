@@ -20,12 +20,10 @@ npm run lint
 
 #### Release
 
-```bash
-# install packager
-npm install electron-packager -g
 
+```bash
 # pack
-npm run pack && electron-packager . --overwrite
+npm run release
 
 # move to Applications and enjoy it
 mv ./boom-darwin-x64/boom.app /Applications
